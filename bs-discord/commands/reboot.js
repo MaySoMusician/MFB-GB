@@ -12,7 +12,7 @@ exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-
   }*/
   
   msgDying.delete().then(()=> {
-    //XPBot.user.setStatus("invisible");
+    MFBGB.BSDiscord.user.setStatus("invisible");
     process.exit(1);
   });
   

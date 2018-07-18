@@ -1,5 +1,11 @@
 // Load up the discord.js library
 const Discord = require("discord.js");
+const { promisify } = require("util");
+const readdir = promisify(require("fs").readdir);
+const Enmap = require("enmap");
+const EnmapLevel = require("enmap-level");
+const moment = require("moment");
+require("moment-duration-format");
 
 module.exports = (MFBGB) => {
   
@@ -12,12 +18,8 @@ module.exports = (MFBGB) => {
   // Reset flag of initialization
   MFBGB.BSDiscord.ready = false;
 
-  // Load settings per guild
-  MFBGB.BSDiscord.vpg = require("./valuePerGuild.js");
-
   // Load some useful functions, collection, etc.
   require("./modules/functions.js")(MFBGB);
-  require("./modules/emojis.js")(MFBGB);
 
 
   // Commands are put in collections where they can be read from, catalogued, listed, etc.
@@ -36,7 +38,7 @@ module.exports = (MFBGB) => {
   const init = async () => {
 
     // Here we load **commands** into memory, as a collection, so they're accessible here and everywhere else.
-    const cmdFiles = await readdir("./commands/");
+    const cmdFiles = await readdir("./bs-discord/commands/"); // somehow readdir method need a parent directory path 'bs-discord'
     MFBGB.logger.log(`|BS-Discord| Loading a total of ${cmdFiles.length} commands...`);
     cmdFiles.forEach(f => {
       if(!f.endsWith(".js")) return; // if it's not js file, just ignore it.
@@ -45,7 +47,7 @@ module.exports = (MFBGB) => {
     });
 
     // Then we load events, which will include our message and ready event.
-    const evtFiles = await readdir("./events/");
+    const evtFiles = await readdir("./bs-discord/events/");
     MFBGB.logger.log(`|BS-Discord| Loading a total of ${evtFiles.length} events...`);
     evtFiles.forEach(file => {
       const eventName = file.split(".")[0];

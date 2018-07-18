@@ -1,6 +1,6 @@
 exports.run = async (MFBGB, message, args) => { // eslint-disable-line no-unused-vars
   const msg = await message.channel.send("ピン？");
-  msg.edit(`ポン！ 遅延は${msg.createdTimestamp - message.createdTimestamp}ミリ秒。API遅延は${Math.round(XPBot.ping)}ミリ秒`);
+  msg.edit(`ポン！ 遅延は${msg.createdTimestamp - message.createdTimestamp}ミリ秒。API遅延は${Math.round(MFBGB.BSDiscord.ping)}ミリ秒`);
 };
 
 exports.conf = {

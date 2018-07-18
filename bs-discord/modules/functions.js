@@ -66,7 +66,7 @@ module.exports = (MFBGB) => {
   MFBGB.BSDiscord.loadCommand = (commandName) => {
     try {
       const props = require(`../commands/${commandName}`);
-      MFBGB.logger.log(`Loading Command: ${props.help.name}.`);
+      MFBGB.logger.log(`|BS-Discord| Loading Command: ${props.help.name}.`);
       if (props.init) {
         props.init(MFBGB);
       }
@@ -84,7 +84,7 @@ module.exports = (MFBGB) => {
     let command;
     if (MFBGB.BSDiscord.commands.has(commandName)) {
       command = MFBGB.BSDiscord.commands.get(commandName);
-    } else if (client.aliases.has(commandName)) {
+    } else if (MFBGB.BSDiscord.aliases.has(commandName)) {
       command = MFBGB.BSDiscord.commands.get(MFBGB.BSDiscord.aliases.get(commandName));
     }
     if (!command) return `The command \`${commandName}\` doesn't seem to exist, nor is it an alias. Try again!`;

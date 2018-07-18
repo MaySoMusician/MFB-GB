@@ -10,8 +10,8 @@ exports.run = (MFBGB, message, args) => {
   if(!args[0]) {
     // Filter all commands by which are available for the user's level, using the <Collection>.filter() method.
     const myCommands = message.guild
-    ? MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.level)
-    : MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= lemessage.author.level && cmd.conf.guildOnly !== true);
+    ? MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel)
+    : MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel && cmd.conf.guildOnly !== true);
 
     // Here we have to get the command names only, and we use that array to get the longest name.
     // This make the help commands "aligned" in the output.
@@ -37,7 +37,7 @@ exports.run = (MFBGB, message, args) => {
     let command = args[0];
     if(MFBGB.BSDiscord.commands.has(command)) {
       command = MFBGB.BSDiscord.commands.get(command);
-      if (message.author.level < client.levelCache[command.conf.permLevel]) return; // if you don't have enough permission, you'll be ignored
+      if (message.author.permLevel < MFBGB.BSDiscord.levelCache[command.conf.permLevel]) return; // if you don't have enough permission, you'll be ignored
       message.channel.send(`= ${command.help.name} = \n${command.help.description}\n使用法:: ${command.help.usage}\n別名　:: ${command.conf.aliases.join(", ")}\n= ${command.help.name} =`, {code:"asciidoc"});
     }
   }
