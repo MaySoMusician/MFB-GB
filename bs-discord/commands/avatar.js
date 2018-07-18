@@ -1,25 +1,25 @@
 const { inspect } = require("util");
-exports.run = async (XPBot, message, args, level) => { // eslint-disable-line no-unused-vars
-  XPBot.user.setAvatar(args[0])
+exports.run = async (MFBGB, message, args) => { // eslint-disable-line no-unused-vars
+  MFBGB.BSDiscord.user.setAvatar(args[0])
     .then(e => {
-    XPBot.log('res', 'アイコンを ' + args[0] + ' に変更しました', 'Log');
+    MFBGB.logger.log(`|BS-Discord| Successful! Bot's avatar changed to ${args[0]}`);
   }).catch(err => {
-    XPBot.log('res', 'アイコン変更に失敗しました: ' + args[0], 'ERR');
-    console.error(err);
+    MFBGB.logger.error(`|BS-Discord| Failed to bot's avatar changed to ${args[0]}`);
+    MFBGB.logger.error(err);
   });
 
 };
 
 exports.conf = {
   enabled: true,
-  guildOnly: true,
+  guildOnly: false,
   aliases: [],
-  permLevel: "水道局長"
+  permLevel: "OWN"
 };
 
 exports.help = {
   name: "avatar",
-  category: "システム",
-  description: "このBotのアイコンを変更します",
+  category: "SYSTEM",
+  description: "Botのアイコンを変更します",
   usage: "avatar [URL]"
 };

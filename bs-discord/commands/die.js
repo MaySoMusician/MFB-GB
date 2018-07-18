@@ -1,31 +1,13 @@
-exports.run = async (XPBot, message, args, level) => {// eslint-disable-line no-unused-vars
-  //let msgDie = await message.reply("XPFaucetBotはシャットダウンしています");
-  XPBot.ready = false;
-  
-  await XPBot.wait(100);
-  
-  XPBot.commands.forEach( async cmd => {
-    await XPBot.unloadCommand(cmd);
+exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-vars
+  MFBGB.BSDiscord.ready = false;
+  //await MFBGB.wait(100);
+  MFBGB.BSDiscord.commands.forEach(async cmd => {
+    await MFBGB.BSDiscord.unloadCommand(cmd);
   });
   
-  /*XPBot.db.forEach(async db =>{
-    await db.closeFromDB();
-  });*/
-  
-  for(dbName in XPBot.db){
-    await XPBot.db[dbName].closeFromDB();
-  }
-  message.reply("XPFaucetBotはシャットダウンできます")
-    .then(()=> {
-    XPBot.user.setStatus("invisible");
-    XPBot.ready = false;
+  message.reply("停止できます").then(()=> {
+    MFBGB.BSDiscord.user.setStatus("invisible");
   });
-  
-  /*await XPBot.db.walletDB.closeFromDB()
-    .then(()=> message.reply("XPFaucetBotはシャットダウンできます"))
-    //.then(()=> msgDie.delete())
-    .then(()=> XPBot.user.setStatus("invisible"));*/
-  //process.exit(1);
   
 };
 
@@ -33,12 +15,12 @@ exports.conf = {
   enabled: true,
   guildOnly: false,
   aliases: [],
-  permLevel: "水道局幹部"
+  permLevel: "OWN"
 };
 
 exports.help = {
   name: "die",
-  category: "システム",
+  category: "SYSTEM",
   description: "Botを終了待機状態にします。",
   usage: "die"
 };
