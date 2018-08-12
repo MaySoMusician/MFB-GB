@@ -7,8 +7,14 @@ module.exports = (MFBGB) => {
     return this[Math.floor(Math.random() * this.length)]
   };
 
-  // `await client.wait(1000);` to "pause" for 1 second.
+  // `await MFBGB.wait(1000);` to "pause" for 1 second.
   MFBGB.wait = require("util").promisify(setTimeout);
+  
+  MFBGB.getTextCnlIdByVoiceCnl = (guild, vc) => {
+    let vpg = MFBGB.vpg.getVPG(guild.id);
+    if(vpg && vpg.VC2TC) return vpg.VC2TC[vc.id];
+    return null;
+  }
 
   // These 2 process methods will catch exceptions and give *more details* about the error and stack trace.
   process.on("uncaughtException", (err) => {
