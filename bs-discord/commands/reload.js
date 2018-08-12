@@ -1,5 +1,4 @@
 exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-vars
-  console.log(!args);
   if(args == false || args.size < 1) return message.reply("再読み込みしたいコマンドを指定してね。");
 
   let response = await MFBGB.BSDiscord.unloadCommand(args[0]);
