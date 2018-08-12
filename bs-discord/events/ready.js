@@ -4,5 +4,8 @@ module.exports = async MFBGB => {
 
   //MFBGB.BSDiscord.user.setActivity(`${MFBGB.config.prefix}help`, {type: "PLAYING"});
   
+  // Initialize the music player
+  require("../../music-player/main.js")(MFBGB);
+  
   MFBGB.BSDiscord.ready = true;
 };
