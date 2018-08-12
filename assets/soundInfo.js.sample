@@ -1,0 +1,17 @@
+const data = {
+  /*'alias': {
+    fileName: 'aaa.mp3',
+    defaultVol: 0.1,
+    descShort: '',
+    descLong: `
+`
+  },*/
+  'example01': {
+    fileName: 'example01.mp3',
+    defaultVol: 0.1,
+    descShort: 'Audio Example',
+    descLong: `BGM "**Audio Example 01**" by John. Thank you, John!`
+  },
+};
+
+module.exports = data;
