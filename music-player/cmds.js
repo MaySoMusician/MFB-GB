@@ -48,7 +48,6 @@ module.exports = (MFBGB) => {
       data.disp = cnc.playStream(ytStream, { // Let's play the music!
         seek: seek,
         volume: vol,
-        passes: 3,
         bitrate: "auto"
       });
       if(typeof funcOnStart === "function") data.disp.on("start", funcOnStart); // i.e. just ignore it if it's not a function
@@ -79,7 +78,6 @@ module.exports = (MFBGB) => {
       data.disp = cnc.playFile("assets/" + fileName, { // Let's play the music!
         seek: seek,
         volume: vol,
-        passes: 3,
         bitrate: "auto"
       });
       
