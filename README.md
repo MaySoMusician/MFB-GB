@@ -1,6 +1,6 @@
 # MFB-GB
 
-MFB-GB, **the Greatest Base of the Mille-Feuille Box**, enables Discord users to enjoy the MFB through listening to the radio, chatting with each others, and giving a tip to the streamers.
+**The Greatest Base of the Mille-Feuille Box** (MFB-GB) enables Discord users to enjoy the MFB through listening to the radio, chatting with each others, and giving a tip to the streamers.
 
 ## Installation
 
@@ -10,7 +10,7 @@ MFB-GB, **the Greatest Base of the Mille-Feuille Box**, enables Discord users to
 
 - Node.js (v8.0 or higher)
 - Discord.js and other dependencies
-- FFmpeg and other encoders you want to use
+- FFmpeg
 
 ### How To Setup
 
