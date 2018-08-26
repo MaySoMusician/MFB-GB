@@ -153,7 +153,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
         opts: {vol: vol},
         funcOnStart: async () => {
           await MFBGB.wait(500);
-          if(radioTextCnl) radioTextCnl.send(`BGM: https://www.youtube.com/watch?v=${movieID}`);
+          if(radioTextCnl && !(args.includes('-silent'))) radioTextCnl.send(`BGM: https://www.youtube.com/watch?v=${movieID}`);
         }
       });
       
@@ -171,7 +171,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
           opts: {vol: soundDatum.defaultVol},
           funcOnStart: async () => {
             await MFBGB.wait(500);
-            if(radioTextCnl) radioTextCnl.send(soundDatum.descLong);
+            if(radioTextCnl && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
           }
         });
         MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
