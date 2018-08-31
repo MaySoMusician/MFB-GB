@@ -1,3 +1,5 @@
+const dbCtrl = require('../../underside/dbCtrl.js');
+
 exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-vars
   MFBGB.BSDiscord.ready = false;
   //await MFBGB.wait(100);
@@ -6,10 +8,14 @@ exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-
   MFBGB.BSDiscord.commands.forEach(async cmd => {
     await MFBGB.BSDiscord.unloadCommand(cmd);
   });
-
-  /*for(dbName in XPBot.db){
-    await XPBot.db[dbName].closeFromDB();
-  }*/
+  
+  let promisesClosingDatabase = [];
+  
+  for(dbName in MFBGB.db) {
+    promisesClosingDatabase.push(dbCtrl.closeDatabase(MFBGB, MFBGB.db[dbName]));
+  }
+  
+  await Promise.all(promisesClosingDatabase);
   
   msgDying.delete().then(()=> {
     MFBGB.BSDiscord.user.setStatus("invisible");
@@ -21,7 +27,7 @@ exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-
 exports.conf = {
   enabled: true,
   guildOnly: false,
-  aliases: [],
+  aliases: ['reb'],
   permLevel: "OWN"
 };
 
