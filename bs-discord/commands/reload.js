@@ -13,7 +13,7 @@ exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-
 exports.conf = {
   enabled: true,
   guildOnly: false,
-  aliases: [],
+  aliases: ['rel'],
   permLevel: "OWN"
 };
 
