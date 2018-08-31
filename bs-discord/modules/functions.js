@@ -66,7 +66,7 @@ module.exports = (MFBGB) => {
   MFBGB.BSDiscord.loadCommand = (commandName) => {
     try {
       const props = require(`../commands/${commandName}`);
-      MFBGB.logger.log(`|BS-Discord| Loading Command: ${props.help.name}.`);
+      MFBGB.Logger.log(`|BS-Discord| Loading Command: ${props.help.name}.`);
       if (props.init) {
         props.init(MFBGB);
       }
@@ -76,6 +76,7 @@ module.exports = (MFBGB) => {
       });
       return false;
     } catch (e) {
+      MFBGB.Logger.error(e.stack);
       return `Unable to load command ${commandName}: ${e}`;
     }
   };

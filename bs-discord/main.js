@@ -39,7 +39,7 @@ module.exports = (MFBGB) => {
 
     // Here we load **commands** into memory, as a collection, so they're accessible here and everywhere else.
     const cmdFiles = await readdir("./bs-discord/commands/"); // somehow readdir method need a parent directory path 'bs-discord'
-    MFBGB.logger.log(`|BS-Discord| Loading a total of ${cmdFiles.length} commands...`);
+    MFBGB.Logger.log(`|BS-Discord| Loading a total of ${cmdFiles.length} commands...`);
     cmdFiles.forEach(f => {
       if(!f.endsWith(".js")) return; // if it's not js file, just ignore it.
       const response = MFBGB.BSDiscord.loadCommand(f);
@@ -48,7 +48,7 @@ module.exports = (MFBGB) => {
 
     // Then we load events, which will include our message and ready event.
     const evtFiles = await readdir("./bs-discord/events/");
-    MFBGB.logger.log(`|BS-Discord| Loading a total of ${evtFiles.length} events...`);
+    MFBGB.Logger.log(`|BS-Discord| Loading a total of ${evtFiles.length} events...`);
     evtFiles.forEach(file => {
       const eventName = file.split(".")[0];
       const event = require(`./events/${file}`);
@@ -71,7 +71,7 @@ module.exports = (MFBGB) => {
       MFBGB.BSDiscord.levelCache[thisLevel.index] = thisLevel.level;
     }
     // Let's login!
-    MFBGB.BSDiscord.login(MFBGB.config.token);
+    MFBGB.BSDiscord.login(MFBGB.config.token['BSDiscord']);
     // End top-level async/await function.
   };
 

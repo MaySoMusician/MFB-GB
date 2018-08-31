@@ -63,7 +63,7 @@ ${message.content}
         message.flags.push(args.shift().slice(1));
       }
       // If the command exists, **AND** the user has permission, run it.
-      MFBGB.logger.cmd(`|BS-Discord| ${message.author.username}(${message.author.id}) as ${levelName} ran '${cmd.help.name} ${args.join(" ")}'`);
+      MFBGB.Logger.cmd(`|BS-Discord| ${message.author.username}(${message.author.id}) as ${levelName} ran '${cmd.help.name} ${args.join(" ")}'`);
       cmd.run(MFBGB, message, args);
     } 
   }

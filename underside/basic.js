@@ -10,6 +10,8 @@ module.exports = (MFBGB) => {
   // `await MFBGB.wait(1000);` to "pause" for 1 second.
   MFBGB.wait = require("util").promisify(setTimeout);
   
+  MFBGB.random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  
   MFBGB.getTextCnlIdByVoiceCnl = (guild, vc) => {
     let vpg = MFBGB.vpg.getVPG(guild.id);
     if(vpg && vpg.VC2TC) return vpg.VC2TC[vc.id];
@@ -19,13 +21,13 @@ module.exports = (MFBGB) => {
   // These 2 process methods will catch exceptions and give *more details* about the error and stack trace.
   process.on("uncaughtException", (err) => {
     const errorMsg = err.stack.replace(new RegExp(`${__dirname}/`, "g"), "./");
-    MFBGB.logger.error(`Uncaught Exception: ${errorMsg}`);
+    MFBGB.Logger.error(`Uncaught Exception: ${errorMsg}`);
     // Always best practice to let the code crash on uncaught exceptions. 
     // Because you should be catching them anyway.
     process.exit(1);
   });
 
   process.on("unhandledRejection", err => {
-    MFBGB.logger.error(`Unhandled rejection: ${err}`);
+    MFBGB.Logger.error(`Unhandled rejection: ${err}`);
   });
 };

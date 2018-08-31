@@ -76,7 +76,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
                                    : null); // If the sender is NOT in any voice channels, return null and end the command
   
   if(radioVoiceCnl === null) {
-    MFBGB.logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
+    MFBGB.Logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
     return;
   }
   
@@ -112,29 +112,29 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
           fadeTime: 2000,
           reason: "User"
         });
-        MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Stopped`);
+        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Stopped`);
         return;
       case "pause":
         await MFBGB.MusicPlayer.cmds.pause({
           guild: g,
           fadeTime: 1000
         });
-        MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Paused`);
+        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Paused`);
         return;
       case "resume":
         await MFBGB.MusicPlayer.cmds.resume({
           guild: g,
           fadeTime: 1000
         });
-        MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Resumed`);
+        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Resumed`);
         return;
       case "vol":
         await setVol(args.shift(), 0);
-        MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
+        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
         return;
       case "fade":
         await setVol(args.shift(), args.shift());
-        MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
+        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
         return;
       default:
         break;
@@ -157,7 +157,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
         }
       });
       
-      MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
+      MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
       return;
     } else{
       let alias = type;
@@ -174,7 +174,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
             if(radioTextCnl && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
           }
         });
-        MFBGB.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
+        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
         return;
       }
     }

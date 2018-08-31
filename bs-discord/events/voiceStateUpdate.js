@@ -48,8 +48,8 @@ module.exports = (MFBGB, oldMember, newMember) => {
       radioTextCnl.send(joinMsg)
         .then(async msg => {
         msg.delete(wait4Del).catch(e => {
-          if(e.code === 10008) MFBGB.logger.error(`|BS-Discord| The message has been deleted: ${e.path}`);
-          else MFBGB.logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`);
+          if(e.code === 10008) MFBGB.Logger.error(`|BS-Discord| The message has been deleted: ${e.path}`);
+          else MFBGB.Logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`);
         });
       });
     };
