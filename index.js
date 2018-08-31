@@ -13,7 +13,7 @@ const MFBGB = {};
 require("./underside/basic.js")(MFBGB);
 
 // Initialize console logger
-MFBGB.logger = require("./underside/logger.js");
+MFBGB.Logger = require("./underside/logger.js");
 
 // Load common settings
 MFBGB.config = require("./config.js");
@@ -30,8 +30,9 @@ require("./underside/emojis.js")(MFBGB);
 
 // Initialize Broadcasting System on Discord
 require("./bs-discord/main.js")(MFBGB);
-// 内部処理用関数読み込み
-//require("./modules/scheduler.js")(XPBot);
+
+// Initialize the task scheduler
+require("./underside/scheduler.js")(MFBGB);
 
 // タスクスケジューラー読み込み
 //XPBot.db.taskScdDB.loadTasksNotYet();
