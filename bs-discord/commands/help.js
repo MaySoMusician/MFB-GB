@@ -19,7 +19,7 @@ exports.run = (MFBGB, message, args) => {
     const longest = commandNames.reduce((long, str) => Math.max(long, str.length), 0);
 
     let currentCategory = "";
-    let output = `= コマンド一覧 =\n\n[${MFBGB.config.prefix}help <コマンド名> で詳細表示]\n`;
+    let output = `= コマンド一覧 =\n\n[${MFBGB.config.prefix['BSDiscord']}help <コマンド名> で詳細表示]\n`;
     const sorted = myCommands.array().sort((p, c) => p.help.category > c.help.category
                                            ? 1
                                            : p.help.name > c.help.name && p.help.category === c.help.category ? 1 : -1 );
@@ -29,7 +29,7 @@ exports.run = (MFBGB, message, args) => {
         output += `\u200b\n== ${cat} ==\n`;
         currentCategory = cat;
       }
-      output += `${MFBGB.config.prefix}${c.help.name}${" ".repeat(longest - c.help.name.length)} :: ${c.help.description}\n`;
+      output += `${MFBGB.config.prefix['BSDiscord']}${c.help.name}${" ".repeat(longest - c.help.name.length)} :: ${c.help.description}\n`;
     });
     message.channel.send(output, {code: "asciidoc", split: { char: "\u200b" }});
   } else {
