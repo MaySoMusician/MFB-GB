@@ -1,0 +1,5 @@
+// This event executes when a new guild (server) is joined.
+
+module.exports = (MFBGB, guild) => {
+  MFBGB.Logger.warn(`|Doppelstimme| [GUILD JOIN] ${guild.name} (${guild.id}) Owner: ${guild.owner.user.tag} (${guild.owner.user.id})`);
+};
