@@ -13,6 +13,9 @@ exports.run = (MFBGB, message, args) => { // eslint-disable-line no-unused-vars
 • Discord.js  :: v${version}
 • Node        :: ${process.version}
 
+= About Doppelstimme =
+Doppelstimme is a peripheral Discord bot for MFB-GB.
+*UNDER NIGHTLY DEVELOPMENT*
 `, {code: "asciidoc"});
 };
 
@@ -26,6 +29,6 @@ exports.conf = {
 exports.help = {
   name: "stats",
   category: "GENERAL",
-  description: "Botに関する統計を表示します。",
+  description: "Botに関する情報を表示します。",
   usage: "stats"
 };
