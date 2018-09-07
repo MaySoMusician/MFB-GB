@@ -33,12 +33,12 @@ ${message.content}
     const levelIndex = MFBGB.config.permLevels.find(l => l.level === level).index;
     const levelName = MFBGB.config.permLevels.find(l => l.level === level).name;
 
-    if(message.content.indexOf(MFBGB.config.prefix) === 0){ // XPFaucet-Botのコマンド
+    if(message.content.indexOf(MFBGB.config.prefix['BSDiscord']) === 0){ // XPFaucet-Botのコマンド
       // Here we separate our "command" name, and our "arguments" for the command.
       // e.g. if we have the message "+say Is this the real life?" , we'll get the following:
       // command = say
       // args = ["Is", "this", "the", "real", "life?"]
-      const args = message.content.slice(MFBGB.config.prefix.length).trim().split(/ +/g);
+      const args = message.content.slice(MFBGB.config.prefix['BSDiscord'].length).trim().split(/ +/g);
       const command = args.shift().toLowerCase();
 
       // Check whether the command, or alias, exist in the collections defined
