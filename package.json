@@ -25,6 +25,7 @@
   "_homepage": "",
   "dependencies": {
     "chalk": "^2.3.0",
+    "cyclic-32": "*",
     "discord.js": "11.3.2",
     "enmap": "^2.0.4",
     "enmap-level": "^2.0.2",
