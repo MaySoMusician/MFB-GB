@@ -209,6 +209,39 @@ module.exports = async (MFBGB) => {
     MFBGB.Logger.log(`|Scheduler| Re-registered the ${type} task (${id}) to the MFBGB Scheduler (in-memory dataset)`);
   };
   
+  MFBGB.Scheduler.deleteTaskById = async (id, from = 'both', reason = '') => {
+    let task = await MFBGB.Scheduler.getTaskById(id, from);
+    if(!task) {
+      let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
+      throw new Error(err);
+    }
+
+    if(!isDefinedTable(from)) from = (typeof task.delayed_for !== 'undefined') ? 'delayable_tasks' : 'time_critical_tasks';
+
+    let isDelayable = from === 'delayable_tasks',
+        type = isDelayable ? 'delayable' : 'time-critical';
+    
+    if(!MFBGB.Scheduler.scheduledTasks.has(id)) {
+      let err = `The ${type} task (${id}) isn't loaded - tasks which aren't loaded can't be deleted`;
+      throw new Error(err);
+    }
+
+    if(task.status !== null) {
+      let err = `The ${type} task (${id}) has seemed to be executed ('${task.status}') - tasks which has already done can't be deleted`;
+      throw new Error(err);
+    }
+    
+    MFBGB.Scheduler.scheduledTasks.get(task.id).cancel();
+    MFBGB.Scheduler.scheduledTasks.delete(task.id);
+    MFBGB.Logger.log(`|Scheduler| Successfully canceled the job of the ${type} task (${id}), and deleted it from the MFBGB Scheduler (in-memory dataset)`);
+    
+    MFBGB.Scheduler.setStatusById(id, 'deleted', from).then(() => {
+      MFBGB.Logger.log(`|Scheduler| Set the status of the ${type} task (${id}) for 'deleted'`);
+    }).catch(err => {
+      MFBGB.Logger.error(`|Scheduler| Couldn't set the status of the ${type} task (${id}): ${err}`);
+    });
+  }
+  
   MFBGB.Scheduler.loadUnfinishedTasks = async () => {
     MFBGB.db.schedulerDB.parallelize(() => {
       MFBGB.db.schedulerDB.each(
