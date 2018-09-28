@@ -217,7 +217,7 @@ module.exports = async (MFBGB) => {
     MFBGB.Logger.log(`|Scheduler| Re-registered the ${type} task (${id}) to the MFBGB Scheduler (in-memory dataset)`);
   };
   
-  MFBGB.Scheduler.deleteTaskById = async (id, from = 'both', reason = '') => {
+  MFBGB.Scheduler.deleteTaskById = async (id, reason = null, from = 'both') => {
     let task = await MFBGB.Scheduler.getTaskById(id, from);
     if(!task) {
       let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
@@ -248,6 +248,14 @@ module.exports = async (MFBGB) => {
     }).catch(err => {
       MFBGB.Logger.error(`|Scheduler| Couldn't set the status of the ${type} task (${id}): ${err}`);
     });
+    
+    if(reason !== null) {
+      MFBGB.Scheduler.setNoteById(id, reason, from).then(() => {
+        MFBGB.Logger.log(`|Scheduler| Set the note of the ${type} task (${id}) for '${reason}' as deletion reason`);
+      }).catch(err => {
+        MFBGB.Logger.error(`|Scheduler| Couldn't set the note of the ${type} task (${id}): ${err}`);
+      });
+    }
   }
   
   MFBGB.Scheduler.loadUnfinishedTasks = async () => {
