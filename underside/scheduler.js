@@ -49,6 +49,28 @@ module.exports = async (MFBGB) => {
 
   const isDefinedTable = tableName => (tableName === 'delayable_tasks' || tableName === 'time_critical_tasks');
   
+  const setSingleOptionById = async (id, optionName, optionValue, from = 'both') => {
+    let task = await MFBGB.Scheduler.getTaskById(id, from);
+    if(!task) {
+      let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
+      //MFBGB.Logger.error(`|Scheduler| ${err}`);
+      return Promise.reject(new Error(err));
+    }
+
+    if(!isDefinedTable(from)) from = (typeof task.delayed_for !== 'undefined') ? 'delayable_tasks' : 'time_critical_tasks';
+
+    return new Promise((resolve, reject) => {
+      MFBGB.db.schedulerDB.run(
+        `UPDATE ${from} SET ${optionName} = $optionValue WHERE id = $id`,
+        { $optionValue: optionValue, $id: id },
+        err => {
+          if(err) reject(err);
+          resolve();
+        }
+      );
+    });
+  };
+  
   MFBGB.Scheduler.regiterTask = async (dateRunAt, context, cmd, params, note, secondsDelayedFor) => {
     let id = parseInt(moment().format('YYMMDDHHmmss') + MFBGB.random(0, 99).toString().padStart(2, '0')),
         task = await MFBGB.Scheduler.getTaskById(id, 'both');
@@ -135,25 +157,7 @@ module.exports = async (MFBGB) => {
   };
 
   MFBGB.Scheduler.setStatusById = async (id, status, from = 'both') => {
-    let task = await MFBGB.Scheduler.getTaskById(id, from);
-    if(!task) {
-      let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
-      //MFBGB.Logger.error(`|Scheduler| ${err}`);
-      return Promise.reject(new Error(err));
-    }
-
-    if(!isDefinedTable(from)) from = (typeof task.delayed_for !== 'undefined') ? 'delayable_tasks' : 'time_critical_tasks';
-
-    return new Promise((resolve, reject) => {
-      MFBGB.db.schedulerDB.run(
-        `UPDATE ${from} SET status = $status WHERE id = $id`,
-        { $status: status, $id: id },
-        err => {
-          if(err) reject(err);
-          resolve();
-        }
-      );
-    });
+    setSingleOptionById(id, 'status', status, from);
   };
 
   MFBGB.Scheduler.loadTaskById = async (id, from = 'both') => {
