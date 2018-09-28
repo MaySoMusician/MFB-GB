@@ -78,7 +78,7 @@ module.exports = async (MFBGB) => {
         $run_at: strRunAt,
         $context: context,
         $cmd: cmd,
-        $params: params,
+        $params: paramsJson,
         $note: note,
         $delayed_for: secondsDelayedFor
       };
@@ -89,7 +89,7 @@ module.exports = async (MFBGB) => {
         $run_at: strRunAt,
         $context: context,
         $cmd: cmd,
-        $params: params,
+        $params: paramsJson,
         $note: note
       };
     }
