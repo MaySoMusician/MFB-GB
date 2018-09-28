@@ -159,6 +159,10 @@ module.exports = async (MFBGB) => {
   MFBGB.Scheduler.setStatusById = async (id, status, from = 'both') => {
     setSingleOptionById(id, 'status', status, from);
   };
+  
+  MFBGB.Scheduler.setNoteById = async (id, note, from = 'both') => {
+    setSingleOptionById(id, 'note', note, from);
+  };
 
   MFBGB.Scheduler.loadTaskById = async (id, from = 'both') => {
     let task = await MFBGB.Scheduler.getTaskById(id, from);
