@@ -49,11 +49,33 @@ module.exports = async (MFBGB) => {
 
   const isDefinedTable = tableName => (tableName === 'delayable_tasks' || tableName === 'time_critical_tasks');
   
+  const setSingleOptionById = async (id, optionName, optionValue, from = 'both') => {
+    let task = await MFBGB.Scheduler.getTaskById(id, from);
+    if(!task) {
+      let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
+      //MFBGB.Logger.error(`|Scheduler| ${err}`);
+      return Promise.reject(new Error(err));
+    }
+
+    if(!isDefinedTable(from)) from = (typeof task.delayed_for !== 'undefined') ? 'delayable_tasks' : 'time_critical_tasks';
+
+    return new Promise((resolve, reject) => {
+      MFBGB.db.schedulerDB.run(
+        `UPDATE ${from} SET ${optionName} = $optionValue WHERE id = $id`,
+        { $optionValue: optionValue, $id: id },
+        err => {
+          if(err) reject(err);
+          resolve();
+        }
+      );
+    });
+  };
+  
   MFBGB.Scheduler.regiterTask = async (dateRunAt, context, cmd, params, note, secondsDelayedFor) => {
     let id = parseInt(moment().format('YYMMDDHHmmss') + MFBGB.random(0, 99).toString().padStart(2, '0')),
         task = await MFBGB.Scheduler.getTaskById(id, 'both');
     if(task) {
-      let err = `The id '${id}' has been used for another task - tasks can't exist with the same id as another task`;
+      let err = `The id '${id}' has been used for another task - no task can exist with the same id as another one`;
       //MFBGB.Logger.error(`|Scheduler| ${err}`);
       return Promise.reject(new Error(err));
     }
@@ -135,25 +157,11 @@ module.exports = async (MFBGB) => {
   };
 
   MFBGB.Scheduler.setStatusById = async (id, status, from = 'both') => {
-    let task = await MFBGB.Scheduler.getTaskById(id, from);
-    if(!task) {
-      let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
-      //MFBGB.Logger.error(`|Scheduler| ${err}`);
-      return Promise.reject(new Error(err));
-    }
-
-    if(!isDefinedTable(from)) from = (typeof task.delayed_for !== 'undefined') ? 'delayable_tasks' : 'time_critical_tasks';
-
-    return new Promise((resolve, reject) => {
-      MFBGB.db.schedulerDB.run(
-        `UPDATE ${from} SET status = $status WHERE id = $id`,
-        { $status: status, $id: id },
-        err => {
-          if(err) reject(err);
-          resolve();
-        }
-      );
-    });
+    setSingleOptionById(id, 'status', status, from);
+  };
+  
+  MFBGB.Scheduler.setNoteById = async (id, note, from = 'both') => {
+    setSingleOptionById(id, 'note', note, from);
   };
 
   MFBGB.Scheduler.loadTaskById = async (id, from = 'both') => {
@@ -171,14 +179,14 @@ module.exports = async (MFBGB) => {
         type = isDelayable ? 'delayable' : 'time-critical';
 
     if(MFBGB.Scheduler.scheduledTasks.has(id)) {
-      let err = `The ${type} task (${id}) has been loaded - tasks can't be loaded more than once`;
+      let err = `The ${type} task (${id}) has been loaded - no tasks can be loaded more than once`;
       throw new Error(err);
       //MFBGB.Logger.error(err);
       //return Promise.reject(new Error(err));
     }
 
     if(task.status === 'done') {
-      let err = `The ${type} task (${id}) has been finished - tasks can't be executed more than once`;
+      let err = `The ${type} task (${id}) has been finished - no task can be executed more than once`;
       throw new Error(err);
       //MFBGB.Logger.error(err);
       //return Promise.reject(new Error(err));
@@ -209,6 +217,47 @@ module.exports = async (MFBGB) => {
     MFBGB.Logger.log(`|Scheduler| Re-registered the ${type} task (${id}) to the MFBGB Scheduler (in-memory dataset)`);
   };
   
+  MFBGB.Scheduler.deleteTaskById = async (id, reason = null, from = 'both') => {
+    let task = await MFBGB.Scheduler.getTaskById(id, from);
+    if(!task) {
+      let err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
+      throw new Error(err);
+    }
+
+    if(!isDefinedTable(from)) from = (typeof task.delayed_for !== 'undefined') ? 'delayable_tasks' : 'time_critical_tasks';
+
+    let isDelayable = from === 'delayable_tasks',
+        type = isDelayable ? 'delayable' : 'time-critical';
+    
+    if(!MFBGB.Scheduler.scheduledTasks.has(id)) {
+      let err = `The ${type} task (${id}) isn't loaded - no task that isn't loaded can be deleted`;
+      throw new Error(err);
+    }
+
+    if(task.status !== null) {
+      let err = `The ${type} task (${id}) has seemed to be executed ('${task.status}') - no task that has already done can be deleted`;
+      throw new Error(err);
+    }
+    
+    MFBGB.Scheduler.scheduledTasks.get(task.id).cancel();
+    MFBGB.Scheduler.scheduledTasks.delete(task.id);
+    MFBGB.Logger.log(`|Scheduler| Successfully canceled the job of the ${type} task (${id}), and deleted it from the MFBGB Scheduler (in-memory dataset)`);
+    
+    MFBGB.Scheduler.setStatusById(id, 'deleted', from).then(() => {
+      MFBGB.Logger.log(`|Scheduler| Set the status of the ${type} task (${id}) for 'deleted'`);
+    }).catch(err => {
+      MFBGB.Logger.error(`|Scheduler| Couldn't set the status of the ${type} task (${id}): ${err}`);
+    });
+    
+    if(reason !== null) {
+      MFBGB.Scheduler.setNoteById(id, reason, from).then(() => {
+        MFBGB.Logger.log(`|Scheduler| Set the note of the ${type} task (${id}) for '${reason}' as deletion reason`);
+      }).catch(err => {
+        MFBGB.Logger.error(`|Scheduler| Couldn't set the note of the ${type} task (${id}): ${err}`);
+      });
+    }
+  }
+  
   MFBGB.Scheduler.loadUnfinishedTasks = async () => {
     MFBGB.db.schedulerDB.parallelize(() => {
       MFBGB.db.schedulerDB.each(
@@ -216,11 +265,16 @@ module.exports = async (MFBGB) => {
         {},
         (err, row) => {
           if(err) {
-            MFBGB.Logger.error(`|Scheduler| An error occurred during loading unfinished tasks from the delayable_tasks table: ${err}`);
+            MFBGB.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the delayable_tasks table: ${err}`);
             return;
           }
           
-          MFBGB.Scheduler.loadTaskById(row.id, 'delayable_tasks');
+          try {
+            MFBGB.Scheduler.loadTaskById(row.id, 'delayable_tasks');
+          } catch(e) {
+            MFBGB.Logger.error(`|Scheduler| An error occurred during loading an unfinished delayable task: ${err}`);
+          }
+          
         }
       );
       
@@ -229,11 +283,16 @@ module.exports = async (MFBGB) => {
         {},
         (err, row) => {
           if(err) {
-            MFBGB.Logger.error(`|Scheduler| An error occurred during loading unfinished tasks from the time_critical_tasks table: ${err}`);
+            MFBGB.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the time_critical_tasks table: ${err}`);
             return;
           }
-
-          MFBGB.Scheduler.loadTaskById(row.id, 'time_critical_tasks');
+          
+          try {
+            MFBGB.Scheduler.loadTaskById(row.id, 'time_critical_tasks');
+          } catch(e) {
+            MFBGB.Logger.error(`|Scheduler| An error occurred during loading an unfinished time-critical task: ${err}`);
+          }
+          
         }
       );
     });
