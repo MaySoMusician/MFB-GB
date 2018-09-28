@@ -253,7 +253,12 @@ module.exports = async (MFBGB) => {
             return;
           }
           
-          MFBGB.Scheduler.loadTaskById(row.id, 'delayable_tasks');
+          try {
+            MFBGB.Scheduler.loadTaskById(row.id, 'delayable_tasks');
+          } catch(e) {
+            MFBGB.Logger.error(`|Scheduler| An error occurred during loading an unfinished delayable task: ${err}`);
+          }
+          
         }
       );
       
@@ -265,8 +270,13 @@ module.exports = async (MFBGB) => {
             MFBGB.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the time_critical_tasks table: ${err}`);
             return;
           }
-
-          MFBGB.Scheduler.loadTaskById(row.id, 'time_critical_tasks');
+          
+          try {
+            MFBGB.Scheduler.loadTaskById(row.id, 'time_critical_tasks');
+          } catch(e) {
+            MFBGB.Logger.error(`|Scheduler| An error occurred during loading an unfinished time-critical task: ${err}`);
+          }
+          
         }
       );
     });
