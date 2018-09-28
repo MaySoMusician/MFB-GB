@@ -53,7 +53,7 @@ module.exports = async (MFBGB) => {
     let id = parseInt(moment().format('YYMMDDHHmmss') + MFBGB.random(0, 99).toString().padStart(2, '0')),
         task = await MFBGB.Scheduler.getTaskById(id, 'both');
     if(task) {
-      let err = `The id '${id}' has been used for another task - tasks can't exist with the same id as another task`;
+      let err = `The id '${id}' has been used for another task - no task can exist with the same id as another one`;
       //MFBGB.Logger.error(`|Scheduler| ${err}`);
       return Promise.reject(new Error(err));
     }
@@ -171,14 +171,14 @@ module.exports = async (MFBGB) => {
         type = isDelayable ? 'delayable' : 'time-critical';
 
     if(MFBGB.Scheduler.scheduledTasks.has(id)) {
-      let err = `The ${type} task (${id}) has been loaded - tasks can't be loaded more than once`;
+      let err = `The ${type} task (${id}) has been loaded - no tasks can be loaded more than once`;
       throw new Error(err);
       //MFBGB.Logger.error(err);
       //return Promise.reject(new Error(err));
     }
 
     if(task.status === 'done') {
-      let err = `The ${type} task (${id}) has been finished - tasks can't be executed more than once`;
+      let err = `The ${type} task (${id}) has been finished - no task can be executed more than once`;
       throw new Error(err);
       //MFBGB.Logger.error(err);
       //return Promise.reject(new Error(err));
@@ -222,12 +222,12 @@ module.exports = async (MFBGB) => {
         type = isDelayable ? 'delayable' : 'time-critical';
     
     if(!MFBGB.Scheduler.scheduledTasks.has(id)) {
-      let err = `The ${type} task (${id}) isn't loaded - tasks which aren't loaded can't be deleted`;
+      let err = `The ${type} task (${id}) isn't loaded - no task that isn't loaded can be deleted`;
       throw new Error(err);
     }
 
     if(task.status !== null) {
-      let err = `The ${type} task (${id}) has seemed to be executed ('${task.status}') - tasks which has already done can't be deleted`;
+      let err = `The ${type} task (${id}) has seemed to be executed ('${task.status}') - no task that has already done can be deleted`;
       throw new Error(err);
     }
     
@@ -249,7 +249,7 @@ module.exports = async (MFBGB) => {
         {},
         (err, row) => {
           if(err) {
-            MFBGB.Logger.error(`|Scheduler| An error occurred during loading unfinished tasks from the delayable_tasks table: ${err}`);
+            MFBGB.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the delayable_tasks table: ${err}`);
             return;
           }
           
@@ -262,7 +262,7 @@ module.exports = async (MFBGB) => {
         {},
         (err, row) => {
           if(err) {
-            MFBGB.Logger.error(`|Scheduler| An error occurred during loading unfinished tasks from the time_critical_tasks table: ${err}`);
+            MFBGB.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the time_critical_tasks table: ${err}`);
             return;
           }
 
