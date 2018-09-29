@@ -12,6 +12,9 @@ const MFBGB = {};
 // Initialize basic functions
 require("./underside/basic.js")(MFBGB);
 
+// Compressed Hexdecimal
+require("./underside/compressedHex.js")(MFBGB);
+
 // Initialize console logger
 MFBGB.Logger = require("./underside/logger.js");
 
