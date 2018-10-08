@@ -26,25 +26,31 @@ exports.run = async (MFBGB, message, args) => { // eslint-disable-line no-unused
     return true;
   };
   
+  const setVol = async (destVol, fadeTime) => {
+    if(destVol === null || destVol === '' || typeof destVol === 'undefined' || // If destVol is null, "", or undefined,
+       isNaN(destVol = destVol - 0)) { // or if it's Not a Number
+      let current = (MFBGB.MusicPlayer.data[g.id].vol * 100).toFixed(2);
+      message.reply(`現在の音量: ${current}%`);
+    } else{
+      destVol = destVol / 100; // to percentage
+      if(fadeTime === 0) MFBGB.MusicPlayer.cmds.changeVol({guild: g, destVol: destVol, dry: false});
+      else await MFBGB.MusicPlayer.cmds.fadeVol({guild: g, destVol: destVol, fadeTime: fadeTime, dry: false});
+    }
+  };
+  
   subCommands['help'] = args => {
     const outputGenerators = {
       'DEFAULT': () => {
-        return '= radiocmdコマンド ヘルプ =\r\n\r\n' +
-          '[!!radiocmd help <サブコマンド名> で詳細表示]\r\n\r\n' + 
-          'bgm  :: 音楽を再生します(YouTube/ローカルファイル)\r\n' +
-          'help :: このヘルプを表示します。\r\n';
-      },
-      'bgm': () => {
         let output = '';
-        
-        output += `= radiocmd bgm コマンドヘルプ
+
+        output += `= radiobgmコマンド ヘルプ =
 音楽を再生します(YouTube/ローカルファイル)
 
-== !!radiocmd bgm yt <動画ID> <音量> ==
+== !!radiobgm play yt <動画ID> <音量> ==
 YouTubeの動画を再生します(著作権に注意)
 https://www.youtube.com/watch?v=<動画ID>
 
-== !!radiocmd bgm <BGM名> ==
+== !!radiobgm play <BGM名> ==
 ローカルに保存されているファイルを再生します
 `;
         let soundNames = Array.from(Object.keys(MFBGB.MusicPlayer.sounds)),
@@ -52,31 +58,34 @@ https://www.youtube.com/watch?v=<動画ID>
         new Map(Object.entries(MFBGB.MusicPlayer.sounds)).forEach((datum, alias) => {
           output += ` ${alias}${" ".repeat(longest - alias.length)} - ${datum.descShort}\n`; // Add a line break
         });
-        
+
         output += `
-== !!radiocmd bgm pause ==
+== !!radiobgm pause ==
 再生中のBGM・ジングルを一時停止させます
 
-== !!radiocmd bgm resume ==
+== !!radiobgm resume ==
 一時停止中のBGM・ジングルを再開させます
 
-== !!radiocmd bgm stop ==
+== !!radiobgm stop ==
 再生中のBGM・ジングルを停止させます
 
-== !!radiocmd bgm vol ==
+== !!radiobgm vol ==
 現在の音量を表示します
 
-== !!radiocmd bgm vol <音量> ==
+== !!radiobgm vol <音量> ==
 音量を変更します (フェード無し)
 
-== !!radiocmd bgm fade <音量> <フェードミリ秒> ==
+== !!radiobgm fade <音量> <フェードミリ秒> ==
 音量を変更します (フェードあり)
 フェード時間はミリ秒(1000分の1秒)で指定します
+
+== !!radiobgm help ==
+このヘルプを表示します。
 
 == 音量について ==
 YouTubeからBGMを再生する場合のみ、音量を指定可能
 音量は%指定(1.0 = 100%, 0.01 = 1%)`;
-        
+
         return output;
       }
     };
@@ -93,56 +102,14 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
     console.log(MFBGB.MusicPlayer.data[g.id]);
   };
   
-  subCommands['bgm'] = async args => {
+  subCommands['play'] = async args => {
     if(!getCnls()) return; // Quit if we couldn't get the voice channel
     
     let arg0 = args.shift();
     if(arg0) arg0.toLowerCase();
     else return; // Quit if we have no arguments
-
-    const setVol = async (destVol, fadeTime) => {
-      if(destVol === null || destVol === '' || typeof destVol === 'undefined' || // If destVol is null, "", or undefined,
-         isNaN(destVol = destVol - 0)) { // or if it's Not a Number
-        let current = (MFBGB.MusicPlayer.data[g.id].vol * 100).toFixed(2);
-        message.reply(`現在の音量: ${current}%`);
-      } else{
-        destVol = destVol / 100; // to percentage
-        if(fadeTime === 0) MFBGB.MusicPlayer.cmds.changeVol({guild: g, destVol: destVol, dry: false});
-        else await MFBGB.MusicPlayer.cmds.fadeVol({guild: g, destVol: destVol, fadeTime: fadeTime, dry: false});
-      }
-    };
     
-    const bgmSubCommands = {
-      'stop': async () => {
-        await MFBGB.MusicPlayer.cmds.stop({
-          guild: g,
-          fadeTime: 2000,
-          reason: "User"
-        });
-        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Stopped`);
-      },
-      'pause': async () => {
-        await MFBGB.MusicPlayer.cmds.pause({
-          guild: g,
-          fadeTime: 1000
-        });
-        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Paused`);
-      },
-      'resume': async () => {
-        await MFBGB.MusicPlayer.cmds.resume({
-          guild: g,
-          fadeTime: 1000
-        });
-        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Resumed`);
-      },
-      'vol': async () => {
-        await setVol(args.shift(), 0);
-        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
-      },
-      'fade': async () => {
-        await setVol(args.shift(), args.shift());
-        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
-      },
+    const playSubCommands = {
       'yt': async () => {
         let movieID = args.shift(),
             vol = parseFloat(args.shift());
@@ -182,16 +149,55 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
       }
     }
 
-    let v;
+    /*let v;
     if(v = parseFloat(arg0)){
       setVol(v, 0);
       return;
-    }
+    }*/
     
-    let bgmSubCmdName = Object.keys(bgmSubCommands).includes(arg0) ? arg0 : 'DEFAULT';
-    bgmSubCommands[bgmSubCmdName]();
+    let playSubCmdName = Object.keys(playSubCommands).includes(arg0) ? arg0 : 'DEFAULT';
+    playSubCommands[playSubCmdName]();
+  };
+
+  subCommands['pause'] = async args => {
+    if(!getCnls()) return false; // Quit if we couldn't get the voice channel
+    await MFBGB.MusicPlayer.cmds.pause({
+      guild: g,
+      fadeTime: 1000
+    });
+    MFBGB.Logger.log(`|BS-Discord| Paused`);
+  };
+
+  subCommands['resume'] = async args => {
+    if(!getCnls()) return false; // Quit if we couldn't get the voice channel
+    await MFBGB.MusicPlayer.cmds.resume({
+      guild: g,
+      fadeTime: 1000
+    });
+    MFBGB.Logger.log(`|BS-Discord| Resumed`);
   };
   
+  subCommands['stop'] = async args => {
+    if(!getCnls()) return false; // Quit if we couldn't get the voice channel
+    await MFBGB.MusicPlayer.cmds.stop({
+      guild: g,
+      fadeTime: 2000,
+      reason: "User"
+    });
+    MFBGB.Logger.log(`|BS-Discord| Stopped`);
+  };
+
+  subCommands['vol'] = async args => {
+    if(!getCnls()) return false; // Quit if we couldn't get the voice channel
+    await setVol(args.shift(), 0);
+    MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
+  };
+
+  subCommands['fade'] = async args => {
+    if(!getCnls()) return false; // Quit if we couldn't get the voice channel
+    await setVol(args.shift(), args.shift());
+    MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
+  };
   subCmdName = Object.keys(subCommands).includes(subCmdName) ? subCmdName : 'help';
   subCommands[subCmdName](args);
   return;
@@ -205,8 +211,8 @@ exports.conf = {
 };
 
 exports.help = {
-  name: "radiocmd",
+  name: "radiobgm",
   category: "RADIO",
-  description: "ラジオ用コマンド",
-  usage: "radiocmd <サブコマンド名> <サブコマンド引数>"
+  description: "ラジオ用BGMコマンド",
+  usage: "radiobgm <サブコマンド名> <サブコマンド引数>"
 };
