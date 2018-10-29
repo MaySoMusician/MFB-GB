@@ -26,14 +26,13 @@ ${message.content}
     if(message.channel.name){
       ainote(XPBot, message);
     }*/
-
-
+    
     // Get the user or member's permission level from the elevation
     const level = MFBGB.BSDiscord.permlevel(message);
     const levelIndex = MFBGB.config.permLevels.find(l => l.level === level).index;
     const levelName = MFBGB.config.permLevels.find(l => l.level === level).name;
 
-    if(message.content.indexOf(MFBGB.config.prefix['BSDiscord']) === 0){ // XPFaucet-Botのコマンド
+    if(message.content.indexOf(MFBGB.config.prefix['BSDiscord']) === 0){
       // Here we separate our "command" name, and our "arguments" for the command.
       // e.g. if we have the message "+say Is this the real life?" , we'll get the following:
       // command = say

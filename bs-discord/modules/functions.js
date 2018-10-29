@@ -65,8 +65,8 @@ module.exports = (MFBGB) => {
 
   MFBGB.BSDiscord.loadCommand = (commandName) => {
     try {
+      MFBGB.Logger.log(`|BS-Discord| Loading Command: ${commandName}.`);
       const props = require(`../commands/${commandName}`);
-      MFBGB.Logger.log(`|BS-Discord| Loading Command: ${props.help.name}.`);
       if (props.init) {
         props.init(MFBGB);
       }
@@ -93,7 +93,14 @@ module.exports = (MFBGB) => {
     if (command.shutdown) {
       await command.shutdown(MFBGB);
     }
+    const mod = require.cache[require.resolve(`../commands/${commandName}.js`)];
     delete require.cache[require.resolve(`../commands/${commandName}.js`)];
+    for (let i = 0; i < mod.parent.children.length; i++) {
+      if (mod.parent.children[i] === mod) {
+        mod.parent.children.splice(i, 1);
+        break;
+      }
+    }
     return false;
   };
 };

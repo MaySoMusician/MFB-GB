@@ -2,8 +2,8 @@
 Logger class for easy and aesthetically pleasing console logging 
 */
 
-const chalk = require("chalk");
-const moment = require("moment");
+const chalk = require("chalk"),
+      moment = require("moment");
 
 exports.log = (content, type = "LOG") => {
   const timestamp = `[${moment().format("YYYY-MM-DD HH:mm:ss")}]:`;
@@ -28,7 +28,7 @@ exports.log = (content, type = "LOG") => {
     }
     default: throw new TypeError("Logger type must be either WAR, DBG, LOG, RDY, CMD or ERR.");
   }
-}; 
+};
 
 exports.error = (...args) => this.log(...args, "ERR");
 

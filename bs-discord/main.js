@@ -3,7 +3,6 @@ const Discord = require("discord.js");
 const { promisify } = require("util");
 const readdir = promisify(require("fs").readdir);
 const Enmap = require("enmap");
-const EnmapLevel = require("enmap-level");
 const moment = require("moment");
 require("moment-duration-format");
 
@@ -52,17 +51,11 @@ module.exports = (MFBGB) => {
     MFBGB.Logger.log(`|BS-Discord| Loading a total of ${evtFiles.length} events...`);
     evtFiles.forEach(file => {
       const eventName = file.split(".")[0];
+      MFBGB.Logger.log(`|BS-Discord| Loading Event: ${eventName}`);
       const event = require(`./events/${file}`);
+      // Bind the client to any event, before the existing arguments provided by Discord.js
       // This line is awesome by the way. Just sayin'.
       MFBGB.BSDiscord.on(eventName, event.bind(null, MFBGB));
-      const mod = require.cache[require.resolve(`./events/${file}`)];
-      delete require.cache[require.resolve(`./events/${file}`)];
-      for (let i = 0; i < mod.parent.children.length; i++) {
-        if (mod.parent.children[i] === mod) {
-          mod.parent.children.splice(i, 1);
-          break;
-        }
-      }
     });
 
     // Generate a cache of client permissions for pretty perms
