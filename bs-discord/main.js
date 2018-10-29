@@ -21,11 +21,12 @@ module.exports = (MFBGB) => {
   // Load some useful functions, collection, etc.
   require("./modules/functions.js")(MFBGB);
 
+  require("./main.private.js")(MFBGB);
 
   // Commands are put in collections where they can be read from, catalogued, listed, etc.
   MFBGB.BSDiscord.commands = new Enmap();
   // So aliases are
-  MFBGB.BSDiscord.aliases = new Enmap(); 
+  MFBGB.BSDiscord.aliases = new Enmap();
    
   // ******** OBSOLETED ********
   // Now we integrate the use of Evie's awesome Enhanced Map module, which essentially saves a collection to disk.
