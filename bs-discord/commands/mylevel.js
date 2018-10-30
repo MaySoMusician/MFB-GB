@@ -7,12 +7,12 @@ exports.conf = {
   enabled: true,
   guildOnly: true,
   aliases: [],
-  permLevel: "USR"
+  permLevel: 'USR',
 };
 
 exports.help = {
-  name: "mylevel",
-  category: "GENERAL",
-  description: "あなたの権限レベルを表示します。",
-  usage: "mylevel"
+  name: 'mylevel',
+  category: 'GENERAL',
+  description: 'あなたの権限レベルを表示します。',
+  usage: 'mylevel',
 };

@@ -1,7 +1,7 @@
 const moment = require('moment');
 
 module.exports = MFBGB => {
-  let tasks = {
+  const tasks = {
     'testScheduler': params => {
       MFBGB.Logger.log(`We've just begun a task named 'testScheduler'.`);
       MFBGB.Logger.log(`This is a test for MFBGB Scheduler.`);
@@ -23,8 +23,7 @@ module.exports = MFBGB => {
     },
     'playBgm': params => {
 
-    }
+    },
   };
-  
   return tasks;
 };
