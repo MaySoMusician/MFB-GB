@@ -1,4 +1,4 @@
-module.exports = (MFBGB) => {
+module.exports = MFBGB => {
   MFBGB.emojisByName = {
     'stopwatch': '\u23f1',
     'timer': '\u23f2',
@@ -33,6 +33,6 @@ module.exports = (MFBGB) => {
     'a': String.fromCodePoint(0x1f170),
     'b': String.fromCodePoint(0x1f171),
     'o2': String.fromCodePoint(0x1f17e),
-    'doge': ':doge:391497526278225920'
+    'doge': ':doge:391497526278225920',
   };
 };

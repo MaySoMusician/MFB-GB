@@ -4,7 +4,8 @@
   "description": "The Greatest Base of the Mille-Feuille Box, enabling Discord users to enjoy the MFB through listening to the radio, chatting with each others, and giving a tip to the streamers.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "eslint *"
   },
   "engines": {
     "node": ">=8"
@@ -25,6 +26,7 @@
   "_homepage": "",
   "dependencies": {
     "chalk": "^2.3.0",
+    "cyclic-32": "^1.0.1",
     "discord.js": "11.3.2",
     "enmap": "^4.2.1",
     "erlpack": "github:discordapp/erlpack",
@@ -41,5 +43,10 @@
     "sqlite3": "^4.0.2",
     "uws": "^9.14.0",
     "ytdl-core": "^0.20.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.8.0",
+    "eslint-config-google": "^0.11.0",
+    "eslint-plugin-node": "^8.0.0"
   }
 }
