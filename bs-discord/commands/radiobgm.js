@@ -93,7 +93,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
       },
     };
 
-    const wantedCmd = Object.keys(outputGenerators).includes(args[0]) ? args[0] : 'DEFAULT';
+    const wantedCmd = Object.keys(outputGenerators).includes(args[0]) ? args[0] : 'DEFAULT'; // eslint-disable-line one-var
     message.channel.send(outputGenerators[wantedCmd](), {code: 'asciidoc', split: {char: '\u200b'}});
   };
 
@@ -108,14 +108,14 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
   subCommands['play'] = async args => {
     if (!getCnls()) return; // Quit if we couldn't get the voice channel
 
-    let arg0 = args.shift();
+    const arg0 = args.shift();
     if (arg0) arg0.toLowerCase();
     else return; // Quit if we have no arguments
 
     const playSubCommands = {
       'yt': async () => {
-        let movieID = args.shift(),
-            vol = parseFloat(args.shift());
+        const movieID = args.shift();
+        let vol = parseFloat(args.shift());
 
         vol = vol ? vol / 100 : 0.01;
 
@@ -133,9 +133,9 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
         MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
       },
       'DEFAULT': async () => {
-        let alias = arg0;
+        const alias = arg0;
         if (alias in MFBGB.MusicPlayer.sounds) {
-          let soundDatum = MFBGB.MusicPlayer.sounds[alias];
+          const soundDatum = MFBGB.MusicPlayer.sounds[alias];
 
           await MFBGB.MusicPlayer.cmds.playFileByAlias({
             guild: g,
@@ -144,7 +144,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
             opts: {vol: soundDatum.defaultVol},
             funcOnStart: async () => {
               await MFBGB.wait(500);
-              if (radioTextCnl && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
+              if (radioTextCnl && soundDatum.descLong !== null && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
             },
           });
           MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
@@ -158,7 +158,7 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
       return;
     }*/
 
-    let playSubCmdName = Object.keys(playSubCommands).includes(arg0) ? arg0 : 'DEFAULT';
+    const playSubCmdName = Object.keys(playSubCommands).includes(arg0) ? arg0 : 'DEFAULT'; // eslint-disable-line one-var
     playSubCommands[playSubCmdName]();
   };
 
