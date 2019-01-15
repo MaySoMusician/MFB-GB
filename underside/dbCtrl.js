@@ -1,17 +1,17 @@
+/* eslint-disable one-var */
 const sqlite3 = require('sqlite3'),
       fse = require('fs-extra'),
       path = require('path');
 
-let openDatabase = (MFBGB, name) => {
+const openDatabase = (MFBGB, name) => {
   let dir = path.parse(name).dir;
   return fse.ensureDir(dir).then(() => {
     MFBGB.Logger.log(`|Underside| Directory preparation for a database '${name}' looks successful`);
-    return new sqlite3.Database(name, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-      if(err) {
+    return new sqlite3.Database(name, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, err => {
+      if (err) {
         MFBGB.Logger.error(`|Underside| Couldn't open or create a database '${name}': ${err}`);
         console.error(err);
-      }
-      else MFBGB.Logger.log(`|Underside| Successfully opened or created a database '${name}'`);
+      } else MFBGB.Logger.log(`|Underside| Successfully opened or created a database '${name}'`);
     });
   }).catch(err => {
     MFBGB.Logger.error(`|Underside| Couldn't prepare directories for a database '${name}': ${err}`);
@@ -19,27 +19,27 @@ let openDatabase = (MFBGB, name) => {
   });
 };
 
-let closeDatabase = (MFBGB, database) => {
+const closeDatabase = (MFBGB, database) => {
   return new Promise((resolve, reject) => {
     try {
       database.close();
       MFBGB.Logger.log(`|Underside| Successfully closed a database '${database.filename}'`);
       resolve();
-    } catch(ex) {
-      MFBGB.Logger.error(`|Underside| Couldn't open/create a database '${database.filename}': ${err}`);
-      console.error(err);
+    } catch (ex) {
+      MFBGB.Logger.error(`|Underside| Couldn't open/create a database '${database.filename}': ${ex}`);
+      console.error(ex);
       reject(ex);
     }
   });
 };
 
-let tableExists = (MFBGB, database, tableName) => {
+const tableExists = (MFBGB, database, tableName) => {
   return new Promise((resolve, reject) => {
     database.get(
       'SELECT count(*) FROM sqlite_master WHERE type = "table" AND name = $name',
-      { $name: tableName },
+      {$name: tableName},
       (err, res) => {
-        if(err) {
+        if (err) {
           MFBGB.Logger.error(`|Underside| Couldn't check if a table named '${tableName}' exists: ${err}`);
           reject(err);
         }
@@ -51,12 +51,12 @@ let tableExists = (MFBGB, database, tableName) => {
   });
 };
 
-let createTable = (MFBGB, database, tableName, columnQuery) => {
+const createTable = (MFBGB, database, tableName, columnQuery) => {
   return new Promise((resolve, reject) => {
     database.run(
       `CREATE TABLE ${tableName}(${columnQuery})`,
       err => {
-        if(err){
+        if (err) {
           MFBGB.Logger.error(`|Underside| Couldn't create a table named '${tableName}' in '${database.filename}': ${err}`);
           reject(err);
         }
@@ -71,5 +71,5 @@ module.exports = {
   openDatabase: openDatabase,
   closeDatabase: closeDatabase,
   tableExists: tableExists,
-  createTable: createTable
+  createTable: createTable,
 };

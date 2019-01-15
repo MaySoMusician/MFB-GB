@@ -64,3 +64,4 @@ typings/
 /MFBGB-pm2-config.json
 /MFBGB-pm2.bat
 /valuePerGuild.js
+*.private.js

@@ -7,38 +7,52 @@ it is not shown to them. If a command name is given with the help command, its e
 
 exports.run = (MFBGB, message, args) => {
   // If no specific command is called, show all filtered commands.
-  if(!args[0]) {
+  if (!args[0]) {
     // Filter all commands by which are available for the user's level, using the <Collection>.filter() method.
     const myCommands = message.guild
-    ? MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel)
-    : MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel && cmd.conf.guildOnly !== true);
+      ? MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel)
+      : MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel && cmd.conf.guildOnly !== true);
 
     // Here we have to get the command names only, and we use that array to get the longest name.
     // This make the help commands "aligned" in the output.
-    const commandNames = myCommands.keyArray();
-    const longest = commandNames.reduce((long, str) => Math.max(long, str.length), 0);
+    const commandNames = myCommands.keyArray(), // eslint-disable-line one-var
+          longest = commandNames.reduce((long, str) => Math.max(long, str.length), 0);
 
-    let currentCategory = "";
-    let output = `= コマンド一覧 =\n\n[${MFBGB.config.prefix['BSDiscord']}help <コマンド名> で詳細表示]\n`;
+    let currentCategory = '',
+        output = `= コマンド一覧 =\n\n[${MFBGB.config.prefix['BSDiscord']}help <コマンド名> で詳細表示]\n`;
+    /* eslint-disable */
     const sorted = myCommands.array().sort((p, c) => p.help.category > c.help.category
-                                           ? 1
-                                           : p.help.name > c.help.name && p.help.category === c.help.category ? 1 : -1 );
-    sorted.forEach( c => {
+                                                     ? 1 // eslint-disable-line
+                                                     : p.help.name > c.help.name && p.help.category === c.help.category ? 1 : -1 );
+    /* eslint-enable */
+    sorted.forEach(c => {
       const cat = c.help.category;
-      if(currentCategory !== cat) {
+      if (currentCategory !== cat) {
         output += `\u200b\n== ${cat} ==\n`;
         currentCategory = cat;
       }
-      output += `${MFBGB.config.prefix['BSDiscord']}${c.help.name}${" ".repeat(longest - c.help.name.length)} :: ${c.help.description}\n`;
+      output += `${MFBGB.config.prefix['BSDiscord']}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}\n`;
     });
-    message.channel.send(output, {code: "asciidoc", split: { char: "\u200b" }});
+    message.channel.send(output, {
+      code: 'asciidoc',
+      split: {char: '\u200b'},
+    });
   } else {
     // Show individual command's help.
     let command = args[0];
-    if(MFBGB.BSDiscord.commands.has(command)) {
+    if (MFBGB.BSDiscord.commands.has(command)) {
       command = MFBGB.BSDiscord.commands.get(command);
       if (message.author.permLevel < MFBGB.BSDiscord.levelCache[command.conf.permLevel]) return; // if you don't have enough permission, you'll be ignored
-      message.channel.send(`= ${command.help.name} = \n${command.help.description}\n使用法:: ${command.help.usage}\n別名　:: ${command.conf.aliases.join(", ")}\n= ${command.help.name} =`, {code:"asciidoc"});
+      /* eslint-disable no-irregular-whitespace */
+      message.channel.send(
+        `= ${command.help.name} =
+${command.help.description}
+使用法:: ${command.help.usage}
+別名　:: ${command.conf.aliases.join(', ')}
+= ${command.help.name} =`,
+        {code: 'asciidoc'}
+      );
+      /* eslint-enable no-irregular-whitespace */
     }
   }
 };
@@ -46,13 +60,13 @@ exports.run = (MFBGB, message, args) => {
 exports.conf = {
   enabled: true,
   guildOnly: false,
-  aliases: ["h", "halp"],
-  permLevel: "USR"
+  aliases: ['h', 'halp'],
+  permLevel: 'USR',
 };
 
 exports.help = {
-  name: "help",
-  category: "GENERAL",
-  description: "権限レベルに合わせて使用可能なコマンドを全て表示します",
-  usage: "help [コマンド名]"
+  name: 'help',
+  category: 'GENERAL',
+  description: '権限レベルに合わせて使用可能なコマンドを全て表示します',
+  usage: 'help [コマンド名]',
 };

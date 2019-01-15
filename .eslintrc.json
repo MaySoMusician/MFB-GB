@@ -6,26 +6,39 @@
     "es6": true,
     "node": true
   },
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "google"
+  ],
+  "plugins": [
+    "node"
+  ],
   "rules": {
     "no-console": "off",
     "indent": [
       "error",
       2,
       {
-        "SwitchCase": 1
+        "SwitchCase": 1,
+        "VariableDeclarator": { "var": 2, "let": 2, "const": 3 },
+        "FunctionDeclaration": {"parameters": "first"},
+        "FunctionExpression": {"parameters": "first"},
+        "CallExpression": {"arguments": "first"},
+        "ArrayExpression": 1,
+        "ObjectExpression": 1
       }
     ],
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
+    "linebreak-style": "off",
     "quotes": [
       "warn",
-      "double"
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
     ],
     "semi": [
-      "warn",
+      "error",
       "always"
     ],
     "keyword-spacing": [
@@ -49,10 +62,61 @@
       }
     ],
     "prefer-const": [
-      "error", {
+      "warn", {
         "destructuring": "any",
         "ignoreReadBeforeAssign": false
       }
-    ]
-  }
+    ],
+    "one-var": [
+      "warn",
+      "consecutive"
+    ],
+    "one-var-declaration-per-line": [
+      "warn",
+      "always"
+    ],
+    "max-len": [
+      "warn",
+      120
+    ],
+    "arrow-parens": [
+      "warn",
+      "as-needed"
+    ],
+    "no-irregular-whitespace": [
+      "error", {
+        "skipStrings": true,
+        "skipComments": true,
+        "skipRegExps": true,
+        "skipTemplates": true
+      }
+    ],
+    "require-jsdoc": "warn",
+    "node/exports-style": [
+      "error",
+      "module.exports"
+    ],
+    "node/no-deprecated-api": "error",
+    "node/no-missing-import": "error",
+    "node/no-missing-require": "error",
+    "node/no-unsupported-features": "error",
+    "node/process-exit-as-throw": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*/commands/*.js"],
+      "rules": {
+        "node/exports-style": [
+          "error",
+          "exports"
+        ]
+      }
+    },
+    {
+      "files": ["*/modules/*.js"],
+      "rules": {
+        "node/exports-style": "off"
+      }
+    }
+  ]
 }

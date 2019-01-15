@@ -1,4 +1,4 @@
-module.exports = (MFBGB) => {
+module.exports = MFBGB => {
   /*
   PERMISSION LEVEL FUNCTION
   This is a very basic permission system for commands which uses "levels".
@@ -34,7 +34,7 @@ module.exports = (MFBGB) => {
     const filter = m => m.author.id === msg.author.id;
     await msg.channel.send(question);
     try {
-      const collected = await msg.channel.awaitMessages(filter, { max: 1, time: limit, errors: ["time"] });
+      const collected = await msg.channel.awaitMessages(filter, {max: 1, time: limit, errors: ['time']});
       return collected.first().content;
     } catch (e) {
       return false;
@@ -50,23 +50,21 @@ module.exports = (MFBGB) => {
   This is mostly only used by the Eval and Exec commands.
   */
   MFBGB.BSDiscord.clean = async (client, text) => {
-    if (text && text.constructor.name == "Promise")
-      text = await text;
-    if (typeof evaled !== "string")
-      text = require("util").inspect(text, {depth: 1});
+    if (text && text.constructor.name == 'Promise') text = await text;
+    if (typeof evaled !== 'string') text = require('util').inspect(text, {depth: 1});
 
     text = text
-      .replace(/`/g, "`" + String.fromCharCode(8203))
-      .replace(/@/g, "@" + String.fromCharCode(8203))
-      .replace(client.token, "mfa.VkO_2G4Qv3T--NO--lWetW_tjND--TOKEN--QFTm6YGtzq9PH--4U--tG0");
+      .replace(/`/g, '`' + String.fromCharCode(8203))
+      .replace(/@/g, '@' + String.fromCharCode(8203))
+      .replace(client.token, 'mfa.VkO_2G4Qv3T--NO--lWetW_tjND--TOKEN--QFTm6YGtzq9PH--4U--tG0');
 
     return text;
   };
 
-  MFBGB.BSDiscord.loadCommand = (commandName) => {
+  MFBGB.BSDiscord.loadCommand = commandName => {
     try {
+      MFBGB.Logger.log(`|BS-Discord| Loading Command: ${commandName}.`);
       const props = require(`../commands/${commandName}`);
-      MFBGB.Logger.log(`|BS-Discord| Loading Command: ${props.help.name}.`);
       if (props.init) {
         props.init(MFBGB);
       }
@@ -81,7 +79,7 @@ module.exports = (MFBGB) => {
     }
   };
 
-  MFBGB.BSDiscord.unloadCommand = async (commandName) => {
+  MFBGB.BSDiscord.unloadCommand = async commandName => {
     let command;
     if (MFBGB.BSDiscord.commands.has(commandName)) {
       command = MFBGB.BSDiscord.commands.get(commandName);
@@ -93,7 +91,14 @@ module.exports = (MFBGB) => {
     if (command.shutdown) {
       await command.shutdown(MFBGB);
     }
+    const mod = require.cache[require.resolve(`../commands/${commandName}.js`)];
     delete require.cache[require.resolve(`../commands/${commandName}.js`)];
+    for (let i = 0; i < mod.parent.children.length; i++) {
+      if (mod.parent.children[i] === mod) {
+        mod.parent.children.splice(i, 1);
+        break;
+      }
+    }
     return false;
   };
 };
