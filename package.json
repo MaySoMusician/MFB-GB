@@ -31,7 +31,7 @@
     "discord.js": "^11.4.2",
     "enmap": "^4.3.3",
     "erlpack": "github:discordapp/erlpack",
-    "ffmpeg-binaries": "^3.2.2-3",
+    "ffmpeg-binaries": "^4.0.0",
     "fs-extra": "^7.0.0",
     "libsodium-wrappers": "^0.7.3",
     "moment": "^2.21.0",
