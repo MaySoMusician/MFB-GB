@@ -7,5 +7,8 @@ module.exports = async MFBGB => {
   // Initialize the music player
   require('../../music-player/main.js')(MFBGB);
 
+  // Initialize the subscribable role module
+  require('../modules/subscribable-role.js')(MFBGB);
+
   MFBGB.BSDiscord.ready = true;
 };

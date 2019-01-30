@@ -24,6 +24,17 @@ module.exports = MFBGB => {
     'playBgm': params => {
 
     },
+    'expireSubscribableRole': async params => {
+      const {roleId} = params;
+      MFBGB.Logger.debug(roleId);
+      try {
+        await MFBGB.BSDiscord.SubscribableRole.expire(roleId);
+      } catch (e) {
+        MFBGB.Logger.error(`An error occurred in expireSubscribableRole: ${e}`);
+        return false;
+      }
+      return true;
+    },
   };
   return tasks;
 };
