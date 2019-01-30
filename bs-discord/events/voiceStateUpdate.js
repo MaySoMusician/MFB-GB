@@ -10,7 +10,7 @@ module.exports = (MFBGB, oldMember, newMember) => {
       } else {
         if (newMember.voiceChannel.guild.id !== MFBGB.config.mainGuild) return;
 
-        let str = newMember.voiceChannel.name;
+        const str = newMember.voiceChannel.name;
         MFBGB.BSDiscord.user.setActivity(str, {type: 'LISTENING'});
       }
     }
@@ -19,15 +19,16 @@ module.exports = (MFBGB, oldMember, newMember) => {
 
   if (oldMember.user.bot) { // empty
   } else {
-    let welcome2VC = m => {
-      let radioVoiceCnl = m.voiceChannel,
-          radioTextCnlID = MFBGB.getTextCnlIdByVoiceCnl(oldMember.guild, radioVoiceCnl);
+    const welcome2VC = m => {
+      const radioVoiceCnl = m.voiceChannel,
+            radioTextCnlID = MFBGB.getTextCnlIdByVoiceCnl(oldMember.guild, radioVoiceCnl);
+
       let radioTextCnl = null;
       if (radioTextCnlID) radioTextCnl = oldMember.guild.channels.get(radioTextCnlID);
       else return;
 
-      let wait4Del = 40 * 1000, // 40 secs
-          numListener = radioVoiceCnl.members.size;
+      const numListener = radioVoiceCnl.members.size;
+      let wait4Del = 40 * 1000; // 40 secs
 
       // Overwrite 'wait4Del' according to the number of listeners
       if (numListener >= 200) return; // Abort this, when >=200 people are in the channel
@@ -36,14 +37,14 @@ module.exports = (MFBGB, oldMember, newMember) => {
       else if (numListener >= 80) wait4Del = 30 * 1000;
 
       /*
-      let joinMsgs = [
+      const joinMsgs = [
         `<@${m.id}>さん、いらっしゃ～い`,
         `、、、ん！？　そうか！そこで <@${m.id}> か！！`,
         `「まだ <@${m.id}> してないの？」`
       ];*/
 
       // let joinMsg = lotSys(MFBGB, joinMsgs, [0.6, 0.3, 0.1]);
-      let joinMsg = `<@${m.id}>さん、いらっしゃ～い`;
+      const joinMsg = `<@${m.id}>さん、いらっしゃ～い`;
 
       radioTextCnl.send(joinMsg)
         .then(async msg => {
