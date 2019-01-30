@@ -17,10 +17,9 @@ module.exports = async MFBGB => {
 
   /* eslint-disable one-var */
   const contextReady = require('./scheduler-contextReady.js')(MFBGB);
-
   const tasks = require('./scheduler-tasks.js')(MFBGB);
 
-  const taskWrapper = (id, context = 'none', cmd, params, note, postStatus = 'done', delayed = false) => {
+  const taskWrapper = async (id, context = 'none', cmd, params, note, postStatus = 'done', delayed = false) => {
     if (!contextReady[context].check) {
       contextReady[context].planB(taskWrapper, id, context, cmd, params, note, postStatus, delayed);
       MFBGB.Logger.log(`|Scheduler| Didn't execute the task (${id}) due to unready context: ${context}`);
@@ -29,7 +28,7 @@ module.exports = async MFBGB => {
     MFBGB.Logger.log(`|Scheduler| Started the task (${id}) ${delayed ? 'belately': 'punctually'} with the context of ${context}`);
     MFBGB.Logger.debug(`cmd: ${cmd}, params: ${params}, note: ${note}, postStatus: ${postStatus}, delayed: ${delayed}`);
 
-    const result = tasks[cmd](params);
+    const result = await tasks[cmd](params);
 
     if (result) {
       MFBGB.Logger.log(`|Scheduler| Successfully finished the task (${id})`);
