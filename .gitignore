@@ -61,6 +61,8 @@ typings/
 # dotenv environment variables file
 .env
 
+assets/*
+!assets/soundInfo.js.sample
 /MFBGB-pm2-config.json
 /MFBGB-pm2.bat
 /valuePerGuild.js
