@@ -2,7 +2,7 @@ exports.run = async (MFBGB, message, args) => {
   const moment = require('moment'),
         UNIT_SATOSHI = 10 ** 8;
   let marketInfosCache = null;
-  const wr = require('../../underside/web-requester.js');
+  const wr = require('../../underside/webRequester.js');
 
   /* eslint-disable one-var */
   // Get infomation of the given currency from CoinExchange and return its wallet status

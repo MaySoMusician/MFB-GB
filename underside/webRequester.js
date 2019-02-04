@@ -8,14 +8,14 @@ const get = (MFBGB, uri, queryStrings, parseJson) => {
   // Format query string for logging debug information
   const strQueryString = querystring.stringify(queryStrings);
 
-  MFBGB.Logger.debug(`GET: ${uri}`);
-  MFBGB.Logger.debug(`${strQueryString === '' ? '(no query string)': '?' + strQueryString}`);
-  MFBGB.Logger.debug(`user-agent: ${userAgent}, parseJson: ${parseJson}`);
+  MFBGB.Logger.debug(`|WebRequester| Get: ${uri}`);
+  MFBGB.Logger.debug(`|WebRequester| ${strQueryString === '' ? '(no query string)': '?' + strQueryString}`);
+  MFBGB.Logger.debug(`|WebRequester| user-agent: ${userAgent}, parseJson: ${parseJson}`);
 
   return rpn({uri: uri, qs: queryStrings, headers: {'User-Agent': userAgent}, json: parseJson}).then(res => {
-    MFBGB.Logger.debug(`GET: Successful`);
+    MFBGB.Logger.debug(`|WebRequester| Get: Successful`);
     return res;
-  }).catch(e => MFBGB.Logger.error(`GET: Failed: ${e}`));
+  }).catch(e => MFBGB.Logger.error(`|WebRequester| Get: Failed: ${e}`));
 };
 
 module.exports = {
