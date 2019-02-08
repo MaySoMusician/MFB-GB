@@ -27,6 +27,7 @@
   "dependencies": {
     "better-sqlite-pool": "^0.1.2",
     "chalk": "^2.3.0",
+    "cheerio-httpcli": "^0.7.3",
     "cyclic-32": "^1.0.1",
     "discord.js": "^11.4.2",
     "enmap": "^4.3.3",
