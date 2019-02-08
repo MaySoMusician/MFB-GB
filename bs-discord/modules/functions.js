@@ -85,8 +85,9 @@ module.exports = MFBGB => {
       command = MFBGB.BSDiscord.commands.get(commandName);
     } else if (MFBGB.BSDiscord.aliases.has(commandName)) {
       command = MFBGB.BSDiscord.commands.get(MFBGB.BSDiscord.aliases.get(commandName));
+      return `\`${commandName}\` is one of the aliases of the command \`${command.help.name}\`. Try to unload \`${command.help.name}\`.`;
     }
-    if (!command) return `The command \`${commandName}\` doesn't seem to exist, nor is it an alias. Try again!`;
+    if (!command) return `The command \`${commandName}\` doesn't seem to exist Try again!`;
 
     if (command.shutdown) {
       await command.shutdown(MFBGB);
