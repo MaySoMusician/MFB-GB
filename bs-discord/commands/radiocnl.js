@@ -40,7 +40,7 @@ exports.run = async (MFBGB, message, args) => {
 == !!radiocnl open ==
 ラジオ用VCを開場して、一般ユーザーが接続できるようにします
 
-== !!radiobgm close ==
+== !!radiocnl close ==
 ラジオ用VCを閉場して、一般ユーザーが接続できないようにします`;
 
         return output;
