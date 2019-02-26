@@ -1,8 +1,13 @@
 exports.run = async (MFBGB, message, args) => {
   const moment = require('moment'),
+        Decimal = require('decimal.js-light'),
         UNIT_SATOSHI = 10 ** 8;
   let marketInfosCache = null;
   const wr = require('../../underside/webRequester.js');
+  Decimal.set({
+    toExpPos: 10,
+    toExpNeg: -10,
+  });
 
   /* eslint-disable one-var */
   // Get infomation of the given currency from CoinExchange and return its wallet status
@@ -79,21 +84,21 @@ exports.run = async (MFBGB, message, args) => {
 
     // Get XPC/DOGE market summary
     const bookXpcDoge = await getMarketSummary(infoXpcDoge.marketId);
-    infoXpcDoge.bid = bookXpcDoge.BidPrice;
-    infoXpcDoge.ask = bookXpcDoge.AskPrice;
-    infoXpcDoge.vol = bookXpcDoge.Volume;
-    infoXpcDoge.btcVol = bookXpcDoge.BTCVolume;
+    infoXpcDoge.bid = new Decimal(bookXpcDoge.BidPrice);
+    infoXpcDoge.ask = new Decimal(bookXpcDoge.AskPrice);
+    infoXpcDoge.vol = new Decimal(bookXpcDoge.Volume);
+    infoXpcDoge.btcVol = new Decimal(bookXpcDoge.BTCVolume);
     MFBGB.Logger.log(`|BS-Discord| [via CoinExchange] XPC/DOGE Bid: ${infoXpcDoge.bid}, Ask: ${infoXpcDoge.ask}, Vol: ${infoXpcDoge.vol} (eq. to ${infoXpcDoge.btcVol} BTC)`);
 
     // Get exchange rate of BTC/DOGE
-    rateBtcDoge = await getCurrencyExchangeRate('dogecoin', 'btc');
-    rateBtcDoge = rateBtcDoge.toFixed(8);
-    rateSatoshiDoge = Number((rateBtcDoge * UNIT_SATOSHI).toFixed(0));
+    rateBtcDoge = new Decimal(await getCurrencyExchangeRate('dogecoin', 'btc'));
+    // rateBtcDoge = rateBtcDoge.toFixed(8);
+    rateSatoshiDoge = rateBtcDoge.mul(UNIT_SATOSHI).toint(); // Number((rateBtcDoge * UNIT_SATOSHI).toFixed(0));
     MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] ${rateBtcDoge} BTC/DOGE (eq. to ${rateSatoshiDoge} sat/DOGE)`);
 
     // Calculate virtual XPC/satoshi market price
-    infoXpcDogeSatoshi.bid = infoXpcDoge.bid * rateSatoshiDoge;
-    infoXpcDogeSatoshi.ask = infoXpcDoge.ask * rateSatoshiDoge;
+    infoXpcDogeSatoshi.bid = (infoXpcDoge.bid).mul(rateSatoshiDoge);
+    infoXpcDogeSatoshi.ask = (infoXpcDoge.ask).mul(rateSatoshiDoge);
     MFBGB.Logger.log(`|BS-Discord| Virtual XPC/satoshi Bid: ${infoXpcDogeSatoshi.bid}, Ask: ${infoXpcDogeSatoshi.ask}`);
 
     strXpcDoge = `**[DOGE建て]** (1 DOGE = ${rateSatoshiDoge} sat)
@@ -113,9 +118,9 @@ exports.run = async (MFBGB, message, args) => {
 
   // Get XPC/BTC market summary
   const bookXpcBtc = await getMarketSummary(infoXpcBtc.marketId);
-  infoXpcBtc.bid = bookXpcBtc.BidPrice;
-  infoXpcBtc.ask = bookXpcBtc.AskPrice;
-  infoXpcBtc.vol = bookXpcBtc.Volume;
+  infoXpcBtc.bid = new Decimal(bookXpcBtc.BidPrice);
+  infoXpcBtc.ask = new Decimal(bookXpcBtc.AskPrice);
+  infoXpcBtc.vol = new Decimal(bookXpcBtc.Volume);
   MFBGB.Logger.log(`|BS-Discord| [via CoinExchange] XPC/BTC Bid: ${infoXpcBtc.bid}, Ask: ${infoXpcBtc.ask}, Vol: ${infoXpcBtc.vol} BTC`);
 
   // Send all data to the requester
@@ -128,8 +133,8 @@ __**:bank: XPC CoinExchange 市場状況 :bank:**__
 ${strXpcDoge}
 
 **[BTC建て]**
-売値: ${infoXpcBtc.bid * UNIT_SATOSHI} sat
-買値: ${infoXpcBtc.ask * UNIT_SATOSHI} sat
+売値: ${(infoXpcBtc.bid).mul(UNIT_SATOSHI)} sat
+買値: ${(infoXpcBtc.ask).mul(UNIT_SATOSHI)} sat
 取引高: ${infoXpcBtc.vol} BTC
 
 (${moment().format('YYYY年MM月DD日 HH時mm分ss秒')})`);
