@@ -65,7 +65,7 @@ exports.run = async (MFBGB, message, args) => {
       infoXpcDoge = {marketId: null, bid: null, ask: null, vol: null, btcVol: null}, // eslint-disable-line prefer-const
       infoXpcBtc = {marketId: null, bid: null, ask: null, vol: null}, // eslint-disable-line prefer-const
       strXpcDoge = '',
-      strXpcBtc = '',
+      // strXpcBtc = '', // unused for now
       rateBtcDoge = 0, // Rounded off to the 9th decimal place in btcs
       rateSatoshiDoge = 0, // Rounded off to integer in satoshis
       infoXpcDogeSatoshi = {bid: null, ask: null}; // eslint-disable-line prefer-const
