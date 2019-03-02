@@ -49,20 +49,21 @@ exports.run = async (MFBGB, message, args) => {
         output += `= radiobgmコマンド ヘルプ =
 音楽を再生します(YouTube/ローカルファイル)
 
-== !!radiobgm play yt <動画ID> <音量> ==
+== !!radiobgm play yt <動画ID> <音量> [-silent]==
 YouTubeの動画を再生します(著作権に注意)
 https://www.youtube.com/watch?v=<動画ID>
 
-== !!radiobgm play <BGM名> ==
+== !!radiobgm play <BGM名> [-v<音量>] [-silent]==
 ローカルに保存されているファイルを再生します
 `;
         const soundNames = Array.from(Object.keys(MFBGB.MusicPlayer.sounds)),
               longest = soundNames.reduce((long, str) => Math.max(long, str.length), 0);
         new Map(Object.entries(MFBGB.MusicPlayer.sounds)).forEach((datum, alias) => {
-          output += ` ${alias}${' '.repeat(longest - alias.length)} - ${datum.descShort}\n`; // Add a line break
+          output += ` ${alias}${' '.repeat(longest - alias.length)} - ${datum.descShort} |vol:${datum.defaultVol * 100}%\n`; // Add a line break
         });
 
-        output += `
+        output += `音量は -v9.5 のように指定します
+
 == !!radiobgm pause ==
 再生中のBGM・ジングルを一時停止させます
 
@@ -86,7 +87,6 @@ https://www.youtube.com/watch?v=<動画ID>
 このヘルプを表示します。
 
 == 音量について ==
-YouTubeからBGMを再生する場合のみ、音量を指定可能
 音量は%指定(1.0 = 100%, 0.01 = 1%)`;
 
         return output;
@@ -137,11 +137,18 @@ YouTubeからBGMを再生する場合のみ、音量を指定可能
         if (alias in MFBGB.MusicPlayer.sounds) {
           const soundDatum = MFBGB.MusicPlayer.sounds[alias];
 
+          let vol = soundDatum.defaultVol,
+              argVol = args.find(e => e.startsWith('-v'));
+
+          if (argVol && (argVol = argVol.substring(2), argVol)) {
+            vol = argVol / 100;
+          }
+
           await MFBGB.MusicPlayer.cmds.playFileByAlias({
             guild: g,
             cnl: radioVoiceCnl,
             alias: alias,
-            opts: {vol: soundDatum.defaultVol},
+            opts: {vol: vol},
             funcOnStart: async () => {
               await MFBGB.wait(500);
               if (radioTextCnl && soundDatum.descLong !== null && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
