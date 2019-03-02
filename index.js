@@ -32,6 +32,3 @@ require('./bs-discord/main.js')(MFBGB);
 
 // Initialize the task scheduler
 require('./underside/scheduler.js')(MFBGB);
-
-// タスクスケジューラー読み込み
-// XPBot.db.taskScdDB.loadTasksNotYet();
