@@ -150,7 +150,7 @@ exports.conf = {
 
 exports.help = {
   name: 'cexpc',
-  category: 'MISC',
-  description: 'cexpc',
+  category: 'CRYPTOCURRENCY',
+  description: 'CoinExchangeのXPCの市場状況を表示します。',
   usage: 'cexpc',
 };
