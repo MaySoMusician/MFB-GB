@@ -35,6 +35,12 @@ module.exports = MFBGB => {
     return null;
   };
 
+  MFBGB.getDefaultStreamingVoiceCnl = guild => {
+    const vpg = MFBGB.vpg.getVPG(guild.id);
+    if (vpg) return vpg.defaultStreamingVC;
+    return null;
+  };
+
   // These 2 process methods will catch exceptions and give *more details* about the error and stack trace.
   process.on('uncaughtException', err => {
     const errorMsg = err.stack.replace(new RegExp(`${__dirname}/`, 'g'), './');
