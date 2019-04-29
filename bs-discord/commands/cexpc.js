@@ -82,7 +82,7 @@ exports.run = async (MFBGB, message, args) => {
   // Get exchange rate of USD/BTC
   rateBtcUsd = new Decimal(await getCurrencyExchangeRate('bitcoin', 'usd'));
   rateSatoshiUsd = rateBtcUsd.div(UNIT_SATOSHI);
-  MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] BTC/USD = ${rateBtcUsd} (eq. to sat/USD = ${rateSatoshiUsd} )`);
+  MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] BTC/USD = ${rateBtcUsd} (eq. to sat/USD = ${rateSatoshiUsd})`);
 
   // Get XPC/DOGE market id
   infoXpcDoge.marketId = await getMarketID('eXPerience Chain', 'Dogecoin');
@@ -99,8 +99,7 @@ exports.run = async (MFBGB, message, args) => {
 
     // Get exchange rate of DOGE/BTC
     rateDogeBtc = new Decimal(await getCurrencyExchangeRate('dogecoin', 'btc'));
-    // rateBtcDoge = rateBtcDoge.toFixed(8);
-    rateDogeSatoshi = rateDogeBtc.mul(UNIT_SATOSHI).toint(); // Number((rateBtcDoge * UNIT_SATOSHI).toFixed(0));
+    rateDogeSatoshi = rateDogeBtc.mul(UNIT_SATOSHI).toint();
     MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] DOGE/BTC = ${rateDogeBtc} (eq. to DOGE/sat = ${rateDogeSatoshi})`);
 
     // Calculate virtual XPC/satoshi market price
@@ -122,7 +121,6 @@ exports.run = async (MFBGB, message, args) => {
     strXpcDoge = `**[DOGE建て]**
 (上場廃止)`;
   }
-
 
   // Get XPC/BTC market id
   infoXpcBtc.marketId = await getMarketID('eXPerience Chain', 'Bitcoin');
