@@ -63,12 +63,14 @@ exports.run = async (MFBGB, message, args) => {
 
   let walletStatus = null,
       infoXpcDoge = {marketId: null, bid: null, ask: null, vol: null, btcVol: null}, // eslint-disable-line prefer-const
-      infoXpcBtc = {marketId: null, bid: null, ask: null, vol: null}, // eslint-disable-line prefer-const
+      infoXpcBtc = {marketId: null, bid: null, ask: null, vol: null, usdBid: null, usdAsk: null}, // eslint-disable-line prefer-const
       strXpcDoge = '',
       // strXpcBtc = '', // unused for now
       rateBtcDoge = 0, // Rounded off to the 9th decimal place in btcs
       rateSatoshiDoge = 0, // Rounded off to integer in satoshis
-      infoXpcDogeSatoshi = {bid: null, ask: null}; // eslint-disable-line prefer-const
+      rateBtcUsd = 0,
+      rateSatoshiUsd = 0,
+      infoXpcDogeSatoshi = {bid: null, ask: null, usdBid: null, usdAsk: null}; // eslint-disable-line prefer-const
 
   // Indicate the bot is getting data
   await message.channel.startTyping();
@@ -76,6 +78,11 @@ exports.run = async (MFBGB, message, args) => {
   // Get XPC's wallet status
   walletStatus = await getWalletStatus('XPC');
   MFBGB.Logger.log(`|BS-Discord| [via CoinExchange] Wallet status: ${walletStatus}`);
+
+  // Get exchange rate of USD/BTC
+  rateBtcUsd = new Decimal(await getCurrencyExchangeRate('bitcoin', 'usd'));
+  rateSatoshiUsd = rateBtcUsd.div(UNIT_SATOSHI);
+  MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] BTC/USD = ${rateBtcUsd} (eq. to sat/USD = ${rateSatoshiUsd} )`);
 
   // Get XPC/DOGE market id
   infoXpcDoge.marketId = await getMarketID('eXPerience Chain', 'Dogecoin');
@@ -101,9 +108,14 @@ exports.run = async (MFBGB, message, args) => {
     infoXpcDogeSatoshi.ask = (infoXpcDoge.ask).mul(rateSatoshiDoge);
     MFBGB.Logger.log(`|BS-Discord| Virtual XPC/satoshi Bid: ${infoXpcDogeSatoshi.bid}, Ask: ${infoXpcDogeSatoshi.ask}`);
 
+    // Calculate virtual XPC/USD market price based on XPC/DOGE
+    infoXpcDogeSatoshi.usdBid = (infoXpcDogeSatoshi.bid).mul(rateSatoshiUsd).todp(8);
+    infoXpcDogeSatoshi.usdAsk = (infoXpcDogeSatoshi.ask).mul(rateSatoshiUsd).todp(8);
+    MFBGB.Logger.log(`|BS-Discord| Virtual XPC/USD (DOGE) Bid: ${infoXpcDogeSatoshi.usdBid}, Ask: ${infoXpcDogeSatoshi.usdAsk}`);
+
     strXpcDoge = `**[DOGE建て]** (1 DOGE = ${rateSatoshiDoge} sat)
-売値: ${infoXpcDogeSatoshi.bid} sat
-買値: ${infoXpcDogeSatoshi.ask} sat
+売値: ${infoXpcDogeSatoshi.bid} sat ($ ${infoXpcDogeSatoshi.usdBid})
+買値: ${infoXpcDogeSatoshi.ask} sat ($ ${infoXpcDogeSatoshi.usdAsk})
 取引高: ${infoXpcDoge.vol} DOGE (${infoXpcDoge.btcVol} BTC)`;
   } else {
     MFBGB.Logger.warn(`|BS-Discord| [via CoinExchange] XPC/DOGE MarketID: Not found`);
@@ -123,6 +135,11 @@ exports.run = async (MFBGB, message, args) => {
   infoXpcBtc.vol = new Decimal(bookXpcBtc.Volume);
   MFBGB.Logger.log(`|BS-Discord| [via CoinExchange] XPC/BTC Bid: ${infoXpcBtc.bid}, Ask: ${infoXpcBtc.ask}, Vol: ${infoXpcBtc.vol} BTC`);
 
+  // Calculate virtual XPC/USD market price based on XPC/BTC
+  infoXpcBtc.usdBid = (infoXpcBtc.bid).mul(UNIT_SATOSHI).mul(rateSatoshiUsd).todp(8);
+  infoXpcBtc.usdAsk = (infoXpcBtc.ask).mul(UNIT_SATOSHI).mul(rateSatoshiUsd).todp(8);
+  MFBGB.Logger.log(`|BS-Discord| Virtual XPC/USD (BTC) Bid: ${infoXpcBtc.usdBid}, Ask: ${infoXpcBtc.usdAsk}`);
+
   // Send all data to the requester
   await message.reply(`
 __**:tools: XPC CoinExchange wallet status :tools:**__
@@ -133,8 +150,8 @@ __**:bank: XPC CoinExchange 市場状況 :bank:**__
 ${strXpcDoge}
 
 **[BTC建て]**
-売値: ${(infoXpcBtc.bid).mul(UNIT_SATOSHI)} sat
-買値: ${(infoXpcBtc.ask).mul(UNIT_SATOSHI)} sat
+売値: ${(infoXpcBtc.bid).mul(UNIT_SATOSHI)} sat ($ ${infoXpcBtc.usdBid})
+買値: ${(infoXpcBtc.ask).mul(UNIT_SATOSHI)} sat ($ ${infoXpcBtc.usdAsk})
 取引高: ${infoXpcBtc.vol} BTC
 
 (${moment().format('YYYY年MM月DD日 HH時mm分ss秒')})`);
