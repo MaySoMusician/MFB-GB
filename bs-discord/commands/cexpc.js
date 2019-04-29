@@ -66,8 +66,8 @@ exports.run = async (MFBGB, message, args) => {
       infoXpcBtc = {marketId: null, bid: null, ask: null, vol: null, usdBid: null, usdAsk: null}, // eslint-disable-line prefer-const
       strXpcDoge = '',
       // strXpcBtc = '', // unused for now
-      rateBtcDoge = 0, // Rounded off to the 9th decimal place in btcs
-      rateSatoshiDoge = 0, // Rounded off to integer in satoshis
+      rateDogeBtc = 0, // Rounded off to the 9th decimal place in btcs
+      rateDogeSatoshi = 0, // Rounded off to integer in satoshis
       rateBtcUsd = 0,
       rateSatoshiUsd = 0,
       infoXpcDogeSatoshi = {bid: null, ask: null, usdBid: null, usdAsk: null}; // eslint-disable-line prefer-const
@@ -97,15 +97,15 @@ exports.run = async (MFBGB, message, args) => {
     infoXpcDoge.btcVol = new Decimal(bookXpcDoge.BTCVolume);
     MFBGB.Logger.log(`|BS-Discord| [via CoinExchange] XPC/DOGE Bid: ${infoXpcDoge.bid}, Ask: ${infoXpcDoge.ask}, Vol: ${infoXpcDoge.vol} (eq. to ${infoXpcDoge.btcVol} BTC)`);
 
-    // Get exchange rate of BTC/DOGE
-    rateBtcDoge = new Decimal(await getCurrencyExchangeRate('dogecoin', 'btc'));
+    // Get exchange rate of DOGE/BTC
+    rateDogeBtc = new Decimal(await getCurrencyExchangeRate('dogecoin', 'btc'));
     // rateBtcDoge = rateBtcDoge.toFixed(8);
-    rateSatoshiDoge = rateBtcDoge.mul(UNIT_SATOSHI).toint(); // Number((rateBtcDoge * UNIT_SATOSHI).toFixed(0));
-    MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] ${rateBtcDoge} BTC/DOGE (eq. to ${rateSatoshiDoge} sat/DOGE)`);
+    rateDogeSatoshi = rateDogeBtc.mul(UNIT_SATOSHI).toint(); // Number((rateBtcDoge * UNIT_SATOSHI).toFixed(0));
+    MFBGB.Logger.log(`|BS-Discord| [via CoinGecko] DOGE/BTC = ${rateDogeBtc} (eq. to DOGE/sat = ${rateDogeSatoshi})`);
 
     // Calculate virtual XPC/satoshi market price
-    infoXpcDogeSatoshi.bid = (infoXpcDoge.bid).mul(rateSatoshiDoge);
-    infoXpcDogeSatoshi.ask = (infoXpcDoge.ask).mul(rateSatoshiDoge);
+    infoXpcDogeSatoshi.bid = (infoXpcDoge.bid).mul(rateDogeSatoshi);
+    infoXpcDogeSatoshi.ask = (infoXpcDoge.ask).mul(rateDogeSatoshi);
     MFBGB.Logger.log(`|BS-Discord| Virtual XPC/satoshi Bid: ${infoXpcDogeSatoshi.bid}, Ask: ${infoXpcDogeSatoshi.ask}`);
 
     // Calculate virtual XPC/USD market price based on XPC/DOGE
@@ -113,7 +113,7 @@ exports.run = async (MFBGB, message, args) => {
     infoXpcDogeSatoshi.usdAsk = (infoXpcDogeSatoshi.ask).mul(rateSatoshiUsd).todp(8);
     MFBGB.Logger.log(`|BS-Discord| Virtual XPC/USD (DOGE) Bid: ${infoXpcDogeSatoshi.usdBid}, Ask: ${infoXpcDogeSatoshi.usdAsk}`);
 
-    strXpcDoge = `**[DOGE建て]** (1 DOGE = ${rateSatoshiDoge} sat)
+    strXpcDoge = `**[DOGE建て]** (1 DOGE = ${rateDogeSatoshi} sat)
 売値: ${infoXpcDogeSatoshi.bid} sat ($ ${infoXpcDogeSatoshi.usdBid})
 買値: ${infoXpcDogeSatoshi.ask} sat ($ ${infoXpcDogeSatoshi.usdAsk})
 取引高: ${infoXpcDoge.vol} DOGE (${infoXpcDoge.btcVol} BTC)`;
