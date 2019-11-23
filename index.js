@@ -15,7 +15,37 @@ require('./underside/compressedHex.js')(MFBGB);
 MFBGB.Logger = require('./underside/logger.js');
 
 // Load common settings
-MFBGB.config = require('./config.js');
+try {
+  MFBGB.config = require('./config.js');
+} catch (_) {
+  MFBGB.config = {
+    // Bot Owner, level 9 by default. A User ID. Should never be anything else than the bot owner's ID.
+    ownerID: process.env.OWNER_ID,
+
+    // Staffs, level 5 by default. Array of user ID strings.
+    staffs: process.env.STAFFS,
+
+    // Bot's Token. Check on https://discordapp.com/developers/applications/me
+    token: process.env.TOKEN,
+
+    // A Discord guild the bot is targeting. A guild ID.
+    mainGuild: process.env.MAIN_GUILD,
+
+    // A Discord guild for front-end logging. A guild ID.
+    logGuild: process.env.LOG_GUILD,
+
+    // Discord guilds where bot's annoucements are posted. Array of guild ID strings.
+    announcementGuild: process.env.ANNOUNCEMENT_GUILD,
+
+    darkskyApiKey: process.env.DARKSKY_API_KEY,
+
+    // Prefix of commands. Strings
+    prefix: process.env.PREFIX,
+
+    // PERMISSION LEVEL DEFINITIONS
+    permLevels: process.env.PERM_LEVELS,
+  };
+}
 
 // Load settings per guild
 MFBGB.vpg = require('./valuePerGuild.js');
