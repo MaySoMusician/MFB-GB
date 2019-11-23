@@ -12,5 +12,5 @@ More detailed information:
 
 [Socket] Session: ${sessionData}`);
 
-  MFBGB.Logger.error(`\nRaw Data: \n${JSON.stringify(error)}`);
+  // MFBGB.Logger.error(`\nRaw Data: \n${JSON.stringify(error)}`);
 };
