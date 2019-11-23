@@ -18,15 +18,22 @@ exports.run = async (MFBGB, message, args) => {
     // Get the voice channel if its name is provided at the last argument
     radioVoiceCnl = g.channels.find(c => c.type === 'voice' && c.name === args[args.length - 1])
                     || (message.member.voiceChannel ? message.member.voiceChannel // Otherwise, get the channel the sender is currently in
-                                                    : null); // If the sender is NOT in any voice channels, return null and end the command
+                                                    : null);
     /* eslint-enable indent */
+
     if (radioVoiceCnl === null) {
-      MFBGB.Logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
-      return false;
+      // Get the default voice channel per guild, even if the sender is NOT in any voice channels
+      const defaultVoiveCnlId = MFBGB.getDefaultStreamingVoiceCnl(g);
+      if (defaultVoiveCnlId) {
+        radioVoiceCnl = g.channels.get(defaultVoiveCnlId);
+      } else {
+        // End the command because we don't find the channel to manage
+        MFBGB.Logger.warn(`|BS-Discord| Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`);
+        return false;
+      }
     }
     // radioTextCnlID = MFBGB.getTextCnlIdByVoiceCnl(g, radioVoiceCnl);
     // if (radioTextCnlID) radioTextCnl = g.channels.get(radioTextCnlID);
-
     return true;
   };
 
