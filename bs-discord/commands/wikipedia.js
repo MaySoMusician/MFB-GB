@@ -25,7 +25,6 @@ exports.run = async (MFBGB, message, args) => {
   };
 
   const parseDablink = ($, html) => { // eslint-disable-line one-var
-    console.log(html);
     let text = html;
     const regexSpan = /<span [^>]*>(.*?)<\/span>/igm;
     while (text.search(regexSpan) !== -1) {
@@ -57,7 +56,6 @@ exports.run = async (MFBGB, message, args) => {
       .replace(/<ul>([\s\w\W]*)<\/ul>/igm, '$1') // Remove <ul> surrounding list
       .replace(/<li>(.*)<\/li>/igm, '・$1') // Replace <li> by normal text prefixed middle dots
       .replace(/<img [^>]*>/igm, ''); // Remove images
-    console.log(text);
     return text;
   };
 
@@ -85,7 +83,6 @@ exports.run = async (MFBGB, message, args) => {
     } else {
       pageName = {encoded: urlRegInfo[2], decoded: decodeURIComponent(urlRegInfo[2])};
     }
-    console.log(pageName);
   } else {
     const name = args.join(' ');
 
@@ -257,7 +254,7 @@ exports.run = async (MFBGB, message, args) => {
 };
 
 exports.conf = {
-  enabled: true,
+  enabled: false,
   guildOnly: false,
   aliases: ['wp'],
   permLevel: 'USR',
