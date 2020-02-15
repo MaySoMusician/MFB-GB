@@ -4,11 +4,11 @@ module.exports = (client, oldMember, newMember) => {
   if (oldMember.id === client.BSDiscord.user.id) { // When this is me, change my presence
     if (oldMember.voiceChannelID !== newMember.voiceChannelID) { // When entering to a voice channel or moving to another channel
       if (!newMember.voiceChannelID) {
-        if (oldMember.voiceChannel.guild.id !== client.config.mainGuild) return;
+        if (oldMember.voiceChannel.guild.id !== client.config.guildTargeted) return;
 
         client.BSDiscord.user.setActivity(null);
       } else {
-        if (newMember.voiceChannel.guild.id !== client.config.mainGuild) return;
+        if (newMember.voiceChannel.guild.id !== client.config.guildTargeted) return;
 
         const str = newMember.voiceChannel.name;
         client.BSDiscord.user.setActivity(str, {type: 'LISTENING'});
