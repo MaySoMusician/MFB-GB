@@ -1,3 +1,5 @@
+const logCategory = 'RadioBGM';
+
 exports.run = async (client, message, args) => {
   message.delete().catch(e => {
     console.error(e);
@@ -19,7 +21,7 @@ exports.run = async (client, message, args) => {
                                                     : null); // If the sender is NOT in any voice channels, return null and end the command
     /* eslint-enable indent */
     if (radioVoiceCnl === null) {
-      client.logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
+      client.logger.warn(`The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`, logCategory);
       return false;
     }
 
@@ -130,7 +132,7 @@ https://www.youtube.com/watch?v=<動画ID>
           },
         });
 
-        client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
+        client.logger.log(`Subcommand: ${subCmdStr} ::: Started playing from YouTube`, logCategory);
       },
       'DEFAULT': async () => {
         const alias = arg0;
@@ -154,7 +156,7 @@ https://www.youtube.com/watch?v=<動画ID>
               if (radioTextCnl && soundDatum.descLong !== null && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
             },
           });
-          client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
+          client.logger.log(`Subcommand: ${subCmdStr} ::: Started playing from local`, logCategory);
         }
       },
     };
@@ -175,7 +177,7 @@ https://www.youtube.com/watch?v=<動画ID>
       guild: g,
       fadeTime: 1000,
     });
-    client.logger.log(`|BS-Discord| Paused`);
+    client.logger.log(`Paused`, logCategory);
   };
 
   subCommands['resume'] = async args => {
@@ -184,7 +186,7 @@ https://www.youtube.com/watch?v=<動画ID>
       guild: g,
       fadeTime: 1000,
     });
-    client.logger.log(`|BS-Discord| Resumed`);
+    client.logger.log(`Resumed`, logCategory);
   };
 
   subCommands['stop'] = async args => {
@@ -194,19 +196,19 @@ https://www.youtube.com/watch?v=<動画ID>
       fadeTime: 2000,
       reason: 'User',
     });
-    client.logger.log(`|BS-Discord| Stopped`);
+    client.logger.log(`Stopped`, logCategory);
   };
 
   subCommands['vol'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await setVol(args.shift(), 0);
-    client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
+    client.logger.log(`Subcommand: ${subCmdStr} ::: Set/got volume`, logCategory);
   };
 
   subCommands['fade'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await setVol(args.shift(), args.shift());
-    client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
+    client.logger.log(`Subcommand: ${subCmdStr} ::: Faded volume`, logCategory);
   };
   subCmdName = Object.keys(subCommands).includes(subCmdName) ? subCmdName : 'help';
   subCommands[subCmdName](args);
@@ -214,15 +216,16 @@ https://www.youtube.com/watch?v=<動画ID>
 };
 
 exports.conf = {
+  name: 'radiobgm',
   enabled: true,
   guildOnly: false,
   aliases: [],
   permLevel: 'STF',
 };
 
-exports.help = {
-  name: 'radiobgm',
-  category: 'RADIO',
-  description: 'ラジオ用BGMコマンド',
-  usage: 'radiobgm <サブコマンド名> <サブコマンド引数>',
-};
+exports.help = [
+  {
+    usage: 'radiobgm <サブコマンド名> <サブコマンド引数>',
+    description: 'ラジオ用BGMコマンド',
+  },
+];

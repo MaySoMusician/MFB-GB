@@ -16,15 +16,16 @@ exports.run = async (client, message, args) => {
 };
 
 exports.conf = {
+  name: 'eval',
   enabled: true,
   guildOnly: false,
   aliases: [],
   permLevel: 'OWN',
 };
 
-exports.help = {
-  name: 'eval',
-  category: 'SYSTEM',
-  description: '任意のJavascriptコードを実行します。',
-  usage: 'eval [...コード]',
-};
+exports.help = [
+  {
+    usage: 'eval [...コード]',
+    description: '任意のJavascriptコードを実行',
+  },
+];

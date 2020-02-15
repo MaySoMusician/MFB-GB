@@ -3,10 +3,8 @@ const dbCtrl = require('../../underside/dbCtrl.js');
 exports.run = async (client, message, args) => {
   // eslint-disable-line no-unused-vars
   client.BSDiscord.ready = false;
-  // await client.wait(100);
-  client.BSDiscord.commands.forEach(async cmd => {
-    await client.BSDiscord.unloadCommand(cmd);
-  });
+
+  client.BSDiscord.commandManager.commands.forEach(async cmd => await client.BSDiscord.commandManager.unloadCommand(cmd));
 
   let promisesClosingDatabase = []; // eslint-disable-line prefer-const
 
@@ -17,23 +15,26 @@ exports.run = async (client, message, args) => {
 
   await Promise.all(promisesClosingDatabase);
 
+  if (args[0] !== 'die') process.exit(1);
+
   message.reply('停止できます').then(() => {
     client.BSDiscord.user.setStatus('invisible');
   });
 
-  client.logger.log('You can now kill me safely');
+  client.logger.log('You can now kill me safely', 'BSDiscord');
 };
 
 exports.conf = {
+  name: 'die',
   enabled: true,
   guildOnly: false,
   aliases: [],
   permLevel: 'OWN',
 };
 
-exports.help = {
-  name: 'die',
-  category: 'SYSTEM',
-  description: 'Botを終了待機状態にします。',
-  usage: 'die',
-};
+exports.help = [
+  {
+    usage: 'die [die]',
+    description: '終了',
+  },
+];

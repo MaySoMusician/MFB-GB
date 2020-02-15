@@ -1,28 +1,5 @@
 module.exports = client => {
   /*
-  PERMISSION LEVEL FUNCTION
-  This is a very basic permission system for commands which uses "levels".
-  "spaces" are intentionally left black so you can add them if you want.
-  NEVER GIVE ANYONE BUT OWNER THE LEVEL 9! By default this can run any
-  command including the VERY DANGEROUS `eval` commands!
-  */
-  client.BSDiscord.permlevel = message => {
-    let permlvl = 0;
-
-    const permOrder = client.config.permLevels.slice(0).sort((p, c) => p.level < c.level ? 1 : -1);
-
-    while (permOrder.length) {
-      const currentLevel = permOrder.shift();
-      if (message.guild && currentLevel.guildOnly) continue;
-      if (currentLevel.check(message)) {
-        permlvl = currentLevel.level;
-        break;
-      }
-    }
-    return permlvl;
-  };
-
-  /*
   SINGLE-LINE AWAITMESSAGE
   A simple way to grab a single reply, from the user that initiated
   the command. Useful to get "precisions" on certain things...
@@ -59,47 +36,5 @@ module.exports = client => {
       .replace(client.token, 'mfa.VkO_2G4Qv3T--NO--lWetW_tjND--TOKEN--QFTm6YGtzq9PH--4U--tG0');
 
     return text;
-  };
-
-  client.BSDiscord.loadCommand = commandName => {
-    try {
-      client.logger.log(`|BS-Discord| Loading Command: ${commandName}.`);
-      const props = require(`../commands/${commandName}`);
-      if (props.init) {
-        props.init(client);
-      }
-      client.BSDiscord.commands.set(props.help.name, props);
-      props.conf.aliases.forEach(alias => {
-        client.BSDiscord.aliases.set(alias, props.help.name);
-      });
-      return false;
-    } catch (e) {
-      client.logger.error(e.stack);
-      return `Unable to load command ${commandName}: ${e}`;
-    }
-  };
-
-  client.BSDiscord.unloadCommand = async commandName => {
-    let command;
-    if (client.BSDiscord.commands.has(commandName)) {
-      command = client.BSDiscord.commands.get(commandName);
-    } else if (client.BSDiscord.aliases.has(commandName)) {
-      command = client.BSDiscord.commands.get(client.BSDiscord.aliases.get(commandName));
-      return `\`${commandName}\` is one of the aliases of the command \`${command.help.name}\`. Try to unload \`${command.help.name}\`.`;
-    }
-    if (!command) return `The command \`${commandName}\` doesn't seem to exist Try again!`;
-
-    if (command.shutdown) {
-      await command.shutdown(client);
-    }
-    const mod = require.cache[require.resolve(`../commands/${commandName}.js`)];
-    delete require.cache[require.resolve(`../commands/${commandName}.js`)];
-    for (let i = 0; i < mod.parent.children.length; i++) {
-      if (mod.parent.children[i] === mod) {
-        mod.parent.children.splice(i, 1);
-        break;
-      }
-    }
-    return false;
   };
 };

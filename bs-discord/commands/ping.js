@@ -4,15 +4,16 @@ exports.run = async (client, message, args) => {
 };
 
 exports.conf = {
+  name: 'ping',
   enabled: true,
   guildOnly: false,
   aliases: [],
   permLevel: 'USR',
 };
 
-exports.help = {
-  name: 'ping',
-  category: 'GENERAL',
-  description: 'ピンポンのようでピンポンでないピンポン。遅延を計算します。',
-  usage: 'ping',
-};
+exports.help = [
+  {
+    usage: 'ping',
+    description: 'ping値を計測',
+  },
+];

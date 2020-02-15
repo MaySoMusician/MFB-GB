@@ -1,3 +1,5 @@
+const logCategory = 'RadioCnl';
+
 exports.run = async (client, message, args) => {
   message.delete().catch(e => {
     console.error(e);
@@ -28,7 +30,7 @@ exports.run = async (client, message, args) => {
         radioVoiceCnl = g.channels.get(defaultVoiveCnlId);
       } else {
         // End the command because we don't find the channel to manage
-        client.logger.warn(`|BS-Discord| Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`);
+        client.logger.warn(`Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`, logCategory);
         return false;
       }
     }
@@ -67,9 +69,9 @@ exports.run = async (client, message, args) => {
       {'CONNECT': true},
       'Started a radio program'
     ).then(() => {
-      client.logger.log(`|BS-Discord| Opened the voice channel '${radioVoiceCnl.name}'`);
+      client.logger.log(`Opened the voice channel '${radioVoiceCnl.name}'`, logCategory);
     }).catch(e => {
-      client.logger.error(`|BS-Discord| Failed to open the voice channel: 'e'`);
+      client.logger.error(`Failed to open the voice channel: 'e'`, logCategory);
     });
   };
 
@@ -82,9 +84,9 @@ exports.run = async (client, message, args) => {
       {'CONNECT': false},
       'Ended a radio program'
     ).then(() => {
-      client.logger.log(`|BS-Discord| Closed the voice channel '${radioVoiceCnl.name}'`);
+      client.logger.log(`Closed the voice channel '${radioVoiceCnl.name}'`, logCategory);
     }).catch(e => {
-      client.logger.error(`|BS-Discord| Failed to close the voice channel: 'e'`);
+      client.logger.error(`Failed to close the voice channel: 'e'`, logCategory);
     });
   };
 
@@ -94,15 +96,16 @@ exports.run = async (client, message, args) => {
 };
 
 exports.conf = {
+  name: 'radiocnl',
   enabled: true,
   guildOnly: false,
   aliases: [],
   permLevel: 'STF',
 };
 
-exports.help = {
-  name: 'radiocnl',
-  category: 'RADIO',
-  description: 'ラジオチャンネル 開閉場コマンド',
-  usage: 'radiocnl <サブコマンド名> <サブコマンド引数>',
-};
+exports.help = [
+  {
+    usage: 'radiocnl <サブコマンド名> <サブコマンド引数>',
+    description: 'ラジオチャンネル 開閉場コマンド',
+  },
+];
