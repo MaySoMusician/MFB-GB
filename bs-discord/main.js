@@ -25,6 +25,9 @@ module.exports = client => {
     client.BSDiscord.commandManager = new (require('./modules/commandManager.js'))(client, client.logger);
     client.BSDiscord.commandManager.init();
 
+    client.BSDiscord.eventManager = new (require('./modules/eventManager.js'))(client, client.logger);
+    client.BSDiscord.eventManager.init();
+
     // Let's login!
     client.BSDiscord.login(client.config.token);
     // End top-level async/await function.

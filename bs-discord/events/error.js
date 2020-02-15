@@ -10,7 +10,7 @@ More detailed information:
 [General] URL: ${error.target.url}
 [Receiver] Type: ${error.target._receiver._binaryType}, Length: ${error.target._receiver._payloadLength}
 
-[Socket] Session: ${sessionData}`);
+[Socket] Session: ${sessionData}`, 'ERROR');
 
   // client.logger.error(`\nRaw Data: \n${JSON.stringify(error)}`);
 };
