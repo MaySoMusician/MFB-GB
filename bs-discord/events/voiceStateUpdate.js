@@ -1,17 +1,17 @@
-module.exports = (MFBGB, oldMember, newMember) => {
-  if (!MFBGB.BSDiscord.ready) return; // Too early!
+module.exports = (client, oldMember, newMember) => {
+  if (!client.BSDiscord.ready) return; // Too early!
 
-  if (oldMember.id === MFBGB.BSDiscord.user.id) { // When this is me, change my presence
+  if (oldMember.id === client.BSDiscord.user.id) { // When this is me, change my presence
     if (oldMember.voiceChannelID !== newMember.voiceChannelID) { // When entering to a voice channel or moving to another channel
       if (!newMember.voiceChannelID) {
-        if (oldMember.voiceChannel.guild.id !== MFBGB.config.mainGuild) return;
+        if (oldMember.voiceChannel.guild.id !== client.config.mainGuild) return;
 
-        MFBGB.BSDiscord.user.setActivity(null);
+        client.BSDiscord.user.setActivity(null);
       } else {
-        if (newMember.voiceChannel.guild.id !== MFBGB.config.mainGuild) return;
+        if (newMember.voiceChannel.guild.id !== client.config.mainGuild) return;
 
         const str = newMember.voiceChannel.name;
-        MFBGB.BSDiscord.user.setActivity(str, {type: 'LISTENING'});
+        client.BSDiscord.user.setActivity(str, {type: 'LISTENING'});
       }
     }
     return;
@@ -21,7 +21,7 @@ module.exports = (MFBGB, oldMember, newMember) => {
   } else {
     const welcome2VC = m => {
       const radioVoiceCnl = m.voiceChannel,
-            radioTextCnlID = MFBGB.getTextCnlIdByVoiceCnl(oldMember.guild, radioVoiceCnl);
+            radioTextCnlID = client.getTextCnlIdByVoiceCnl(oldMember.guild, radioVoiceCnl);
 
       let radioTextCnl = null;
       if (radioTextCnlID) radioTextCnl = oldMember.guild.channels.get(radioTextCnlID);
@@ -43,14 +43,14 @@ module.exports = (MFBGB, oldMember, newMember) => {
         `「まだ <@${m.id}> してないの？」`
       ];*/
 
-      // let joinMsg = lotSys(MFBGB, joinMsgs, [0.6, 0.3, 0.1]);
+      // let joinMsg = lotSys(client, joinMsgs, [0.6, 0.3, 0.1]);
       const joinMsg = `<@${m.id}>さん、いらっしゃ～い`;
 
       radioTextCnl.send(joinMsg)
         .then(async msg => {
           msg.delete(wait4Del).catch(e => {
-            if (e.code === 10008) MFBGB.Logger.error(`|BS-Discord| The message has been deleted: ${e.path}`);
-            else MFBGB.Logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`);
+            if (e.code === 10008) client.Logger.error(`|BS-Discord| The message has been deleted: ${e.path}`);
+            else client.Logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`);
           });
         });
     };

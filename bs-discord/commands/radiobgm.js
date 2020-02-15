@@ -1,4 +1,4 @@
-exports.run = async (MFBGB, message, args) => {
+exports.run = async (client, message, args) => {
   message.delete().catch(e => {
     console.error(e);
   });
@@ -19,11 +19,11 @@ exports.run = async (MFBGB, message, args) => {
                                                     : null); // If the sender is NOT in any voice channels, return null and end the command
     /* eslint-enable indent */
     if (radioVoiceCnl === null) {
-      MFBGB.Logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
+      client.Logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
       return false;
     }
 
-    radioTextCnlID = MFBGB.getTextCnlIdByVoiceCnl(g, radioVoiceCnl);
+    radioTextCnlID = client.getTextCnlIdByVoiceCnl(g, radioVoiceCnl);
     if (radioTextCnlID) radioTextCnl = g.channels.get(radioTextCnlID);
 
     return true;
@@ -32,12 +32,12 @@ exports.run = async (MFBGB, message, args) => {
   const setVol = async (destVol, fadeTime) => { // eslint-disable-line one-var
     if (destVol === null || destVol === '' || typeof destVol === 'undefined' || // If destVol is null, "", or undefined,
        isNaN(destVol = destVol - 0)) { // or if it's Not a Number
-      const current = (MFBGB.MusicPlayer.data[g.id].vol * 100).toFixed(2);
+      const current = (client.MusicPlayer.data[g.id].vol * 100).toFixed(2);
       message.reply(`現在の音量: ${current}%`);
     } else {
       destVol = destVol / 100; // to percentage
-      if (fadeTime === 0) MFBGB.MusicPlayer.cmds.changeVol({guild: g, destVol: destVol, dry: false});
-      else await MFBGB.MusicPlayer.cmds.fadeVol({guild: g, destVol: destVol, fadeTime: fadeTime, dry: false});
+      if (fadeTime === 0) client.MusicPlayer.cmds.changeVol({guild: g, destVol: destVol, dry: false});
+      else await client.MusicPlayer.cmds.fadeVol({guild: g, destVol: destVol, fadeTime: fadeTime, dry: false});
     }
   };
 
@@ -56,9 +56,9 @@ https://www.youtube.com/watch?v=<動画ID>
 == !!radiobgm play <BGM名> [-v<音量>] [-silent]==
 ローカルに保存されているファイルを再生します
 `;
-        const soundNames = Array.from(Object.keys(MFBGB.MusicPlayer.sounds)),
+        const soundNames = Array.from(Object.keys(client.MusicPlayer.sounds)),
               longest = soundNames.reduce((long, str) => Math.max(long, str.length), 0);
-        new Map(Object.entries(MFBGB.MusicPlayer.sounds)).forEach((datum, alias) => {
+        new Map(Object.entries(client.MusicPlayer.sounds)).forEach((datum, alias) => {
           output += ` ${alias}${' '.repeat(longest - alias.length)} - ${datum.descShort} |vol:${datum.defaultVol * 100}%\n`; // Add a line break
         });
 
@@ -98,11 +98,11 @@ https://www.youtube.com/watch?v=<動画ID>
   };
 
   subCommands['reset'] = args => {
-    MFBGB.MusicPlayer.cmds.forceReset(g);
+    client.MusicPlayer.cmds.forceReset(g);
   };
 
   subCommands['info'] = args => {
-    console.log(MFBGB.MusicPlayer.data[g.id]);
+    console.log(client.MusicPlayer.data[g.id]);
   };
 
   subCommands['play'] = async args => {
@@ -119,23 +119,23 @@ https://www.youtube.com/watch?v=<動画ID>
 
         vol = vol ? vol / 100 : 0.01;
 
-        await MFBGB.MusicPlayer.cmds.playYouTube({
+        await client.MusicPlayer.cmds.playYouTube({
           guild: g,
           cnl: radioVoiceCnl,
           movieID: movieID,
           opts: {vol: vol},
           funcOnStart: async () => {
-            await MFBGB.wait(500);
+            await client.wait(500);
             if (radioTextCnl && !(args.includes('-silent'))) radioTextCnl.send(`BGM: https://www.youtube.com/watch?v=${movieID}`);
           },
         });
 
-        MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
+        client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
       },
       'DEFAULT': async () => {
         const alias = arg0;
-        if (alias in MFBGB.MusicPlayer.sounds) {
-          const soundDatum = MFBGB.MusicPlayer.sounds[alias];
+        if (alias in client.MusicPlayer.sounds) {
+          const soundDatum = client.MusicPlayer.sounds[alias];
 
           let vol = soundDatum.defaultVol,
               argVol = args.find(e => e.startsWith('-v'));
@@ -144,17 +144,17 @@ https://www.youtube.com/watch?v=<動画ID>
             vol = argVol / 100;
           }
 
-          await MFBGB.MusicPlayer.cmds.playFileByAlias({
+          await client.MusicPlayer.cmds.playFileByAlias({
             guild: g,
             cnl: radioVoiceCnl,
             alias: alias,
             opts: {vol: vol},
             funcOnStart: async () => {
-              await MFBGB.wait(500);
+              await client.wait(500);
               if (radioTextCnl && soundDatum.descLong !== null && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
             },
           });
-          MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
+          client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
         }
       },
     };
@@ -171,42 +171,42 @@ https://www.youtube.com/watch?v=<動画ID>
 
   subCommands['pause'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
-    await MFBGB.MusicPlayer.cmds.pause({
+    await client.MusicPlayer.cmds.pause({
       guild: g,
       fadeTime: 1000,
     });
-    MFBGB.Logger.log(`|BS-Discord| Paused`);
+    client.Logger.log(`|BS-Discord| Paused`);
   };
 
   subCommands['resume'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
-    await MFBGB.MusicPlayer.cmds.resume({
+    await client.MusicPlayer.cmds.resume({
       guild: g,
       fadeTime: 1000,
     });
-    MFBGB.Logger.log(`|BS-Discord| Resumed`);
+    client.Logger.log(`|BS-Discord| Resumed`);
   };
 
   subCommands['stop'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
-    await MFBGB.MusicPlayer.cmds.stop({
+    await client.MusicPlayer.cmds.stop({
       guild: g,
       fadeTime: 2000,
       reason: 'User',
     });
-    MFBGB.Logger.log(`|BS-Discord| Stopped`);
+    client.Logger.log(`|BS-Discord| Stopped`);
   };
 
   subCommands['vol'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await setVol(args.shift(), 0);
-    MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
+    client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
   };
 
   subCommands['fade'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await setVol(args.shift(), args.shift());
-    MFBGB.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
+    client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
   };
   subCmdName = Object.keys(subCommands).includes(subCmdName) ? subCmdName : 'help';
   subCommands[subCmdName](args);

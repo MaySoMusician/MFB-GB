@@ -5,19 +5,19 @@ const // sqlite3 = require('sqlite3'),
       path = require('path');
 require('moment-duration-format');
 
-module.exports = async MFBGB => {
-  MFBGB.BSDiscord.SubscribableRole = {
+module.exports = async client => {
+  client.BSDiscord.SubscribableRole = {
     loadedRoles: new Map(),
   };
 
-  if (!MFBGB.db) MFBGB.db = {};
-  MFBGB.db.subscribableRolesDB = await dbCtrl.openDatabase(MFBGB, path.resolve(__dirname, '../../data/db/subscribable-roles.db'));
-  MFBGB.db.subscribableRolesDB.serialize(); // Calling this with no parameter causes the database to set its execution mode for 'serialize'
+  if (!client.db) client.db = {};
+  client.db.subscribableRolesDB = await dbCtrl.openDatabase(client, path.resolve(__dirname, '../../data/db/subscribable-roles.db'));
+  client.db.subscribableRolesDB.serialize(); // Calling this with no parameter causes the database to set its execution mode for 'serialize'
 
   const EPOCH = new Date(2018, 7, 11, 20, 0, 0); // Original air date of No-Radio
 
   const setSingleOption = async (roleId, optionName, optionValue) => { // eslint-disable-line one-var
-    let role = MFBGB.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
+    let role = client.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
 
     if (role) {
       if (optionName === 'roleObj') {
@@ -33,7 +33,7 @@ module.exports = async MFBGB => {
       role[optionName] = optionValue;
       updateLoadedRole(roleId, role);
     } else {
-      role = await MFBGB.BSDiscord.SubscribableRole.getRoleById(roleId);
+      role = await client.BSDiscord.SubscribableRole.getRoleById(roleId);
 
       if (!role) {
         const err = `The id '${roleId}' is invalid`;
@@ -42,14 +42,14 @@ module.exports = async MFBGB => {
     }
 
     return new Promise((resolve, reject) => {
-      MFBGB.db.subscribableRolesDB.run(
+      client.db.subscribableRolesDB.run(
         `UPDATE roles SET ${optionName} = $optionValue WHERE id = $id`,
         {$optionValue: optionValue, $id: roleId},
         err => {
           if (err) reject(err);
 
           const discordID = (role.roleObj) ? role.roleObj.id : role.role_guild_id;
-          MFBGB.Logger.log(`|SubscribableRole| Set '${optionName}' of the role (In-bot ID: ${roleId}, In-Discord ID: ${discordID}) for '${optionValue}'`);
+          client.Logger.log(`|SubscribableRole| Set '${optionName}' of the role (In-bot ID: ${roleId}, In-Discord ID: ${discordID}) for '${optionValue}'`);
           resolve();
         }
       );
@@ -57,36 +57,36 @@ module.exports = async MFBGB => {
   };
 
   const updateLoadedRole = (roleId, newRole) => { // eslint-disable-line one-var
-    const role = MFBGB.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
+    const role = client.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
 
     if (!role) {
       const err = `The id ${roleId} is invalid`;
       throw new TypeError(err);
     }
 
-    MFBGB.BSDiscord.SubscribableRole.loadedRoles.set(roleId, newRole);
-    MFBGB.Logger.log(`|SubscribableRole| Updated the loaded role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
+    client.BSDiscord.SubscribableRole.loadedRoles.set(roleId, newRole);
+    client.Logger.log(`|SubscribableRole| Updated the loaded role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
   };
 
   // In order for a role not to expire, set dateExpireAt for null
-  MFBGB.BSDiscord.SubscribableRole.registerRole = async (alias, guild, dateExpireAt, note) => {
-    const strId = (Date.now() - EPOCH) + MFBGB.random(0, 99).toString().padStart(2, '0'),
+  client.BSDiscord.SubscribableRole.registerRole = async (alias, guild, dateExpireAt, note) => {
+    const strId = (Date.now() - EPOCH) + client.random(0, 99).toString().padStart(2, '0'),
           numId = +strId, // Convert to a number
-          dupRole = await MFBGB.BSDiscord.SubscribableRole.getRoleById(numId);
+          dupRole = await client.BSDiscord.SubscribableRole.getRoleById(numId);
 
     if (dupRole) {
       const err = `The id '${strId}' has been used for another role`;
       return Promise.reject(new Error(err));
     }
 
-    const compHexId = MFBGB.compHex.compress(numId.toString(16)),
+    const compHexId = client.compHex.compress(numId.toString(16)),
           name = `${alias}_${compHexId}`,
           neverExpired = dateExpireAt === null,
           strExpireAt = neverExpired ? null : moment(dateExpireAt).format('YYYY-MM-DD HH:mm:ss');
     let expireTaskId = null;
 
     if (!neverExpired) {
-      expireTaskId = await MFBGB.Scheduler.regiterTask(
+      expireTaskId = await client.Scheduler.regiterTask(
         /* dateRunAt= */ dateExpireAt,
         /* context= */ 'BSDiscord',
         /* cmd= */ 'expireSubscribableRole',
@@ -104,7 +104,7 @@ module.exports = async MFBGB => {
       mentionable: false,
     }, 'New subcribable role');
 
-    MFBGB.Logger.log(`|SubscribableRole| Created a new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the guild '${guild.name}' (${guild.id})`);
+    client.Logger.log(`|SubscribableRole| Created a new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the guild '${guild.name}' (${guild.id})`);
 
     const newRoleEntry = {
       id: numId,
@@ -116,11 +116,11 @@ module.exports = async MFBGB => {
       roleObj: newRoleObj,
     };
 
-    MFBGB.BSDiscord.SubscribableRole.loadedRoles.set(numId, newRoleEntry);
-    MFBGB.Logger.log(`|SubscribableRole| Registered the new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) to the MFBGB`);
+    client.BSDiscord.SubscribableRole.loadedRoles.set(numId, newRoleEntry);
+    client.Logger.log(`|SubscribableRole| Registered the new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) to the client`);
 
     return new Promise((resolve, reject) => {
-      MFBGB.db.subscribableRolesDB.run(
+      client.db.subscribableRolesDB.run(
         'INSERT INTO roles(id, alias, role_id, role_name, role_guild_id, expire_at, expire_task_id, note) VALUES($id, $alias, $role_id, $role_name, $role_guild_id, $expire_at, $expire_task_id, $note)',
         {
           $id: numId,
@@ -134,19 +134,19 @@ module.exports = async MFBGB => {
         },
         err => {
           if (err) {
-            MFBGB.Logger.error(`|SubscribableRole| Couldn't register the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table: ${err}`);
+            client.Logger.error(`|SubscribableRole| Couldn't register the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table: ${err}`);
             reject(err);
           }
-          MFBGB.Logger.log(`|SubscribableRole| Registered the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table`);
+          client.Logger.log(`|SubscribableRole| Registered the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table`);
           resolve(numId);
         }
       );
     });
   };
 
-  MFBGB.BSDiscord.SubscribableRole.getRoleById = async id => {
+  client.BSDiscord.SubscribableRole.getRoleById = async id => {
     return new Promise((resolve, reject) => {
-      MFBGB.db.subscribableRolesDB.get(
+      client.db.subscribableRolesDB.get(
         'SELECT * FROM roles WHERE id = $id',
         {$id: id},
         (err, res) => {
@@ -155,8 +155,8 @@ module.exports = async MFBGB => {
             reject(err);
           }
 
-          if (res && MFBGB.BSDiscord.guilds.has(res.role_guild_id)) {
-            const g = MFBGB.BSDiscord.guilds.get(res.role_guild_id);
+          if (res && client.BSDiscord.guilds.has(res.role_guild_id)) {
+            const g = client.BSDiscord.guilds.get(res.role_guild_id);
             if (g.roles.has(res.role_id)) res.roleObj = g.roles.get(res.role_id);
             else res.roleObj = null; // probably it's been deleted
           }
@@ -166,12 +166,12 @@ module.exports = async MFBGB => {
     });
   };
 
-  MFBGB.BSDiscord.SubscribableRole.setStatus = async (roleId, status) => {
+  client.BSDiscord.SubscribableRole.setStatus = async (roleId, status) => {
     return setSingleOption(roleId, 'status', status);
   };
 
-  MFBGB.BSDiscord.SubscribableRole.setExpireAt = async (roleId, dateExpireAt) => {
-    const role = MFBGB.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
+  client.BSDiscord.SubscribableRole.setExpireAt = async (roleId, dateExpireAt) => {
+    const role = client.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
 
     if (!role) {
       const err = `The id ${roleId} is invalid`;
@@ -183,26 +183,26 @@ module.exports = async MFBGB => {
 
     return new Promise(async (resolve, reject) => {
       if (role.expire_task_id !== null) {
-        MFBGB.Scheduler.deleteTaskById(role.expire_task_id, 'For changing expire_at', 'delayable_tasks');
+        client.Scheduler.deleteTaskById(role.expire_task_id, 'For changing expire_at', 'delayable_tasks');
 
         role.expire_at = null;
         role.expire_task_id = null;
         updateLoadedRole(roleId, role);
 
-        MFBGB.db.subscribableRolesDB.run(
+        client.db.subscribableRolesDB.run(
           'UPDATE roles SET expire_at = NULL, expire_task_id = NULL WHERE id = $id',
           {$id: role.id},
           err => {
             if (err) reject(err);
 
-            MFBGB.Logger.log(`|SubscribableRole| Canceled the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
+            client.Logger.log(`|SubscribableRole| Canceled the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
             resolve();
           }
         );
       }
 
       if (!neverExpired) {
-        const expireTaskId = await MFBGB.Scheduler.regiterTask(
+        const expireTaskId = await client.Scheduler.regiterTask(
           /* dateRunAt= */ dateExpireAt,
           /* context= */ 'BSDiscord',
           /* cmd= */ 'expireSubscribableRole',
@@ -215,13 +215,13 @@ module.exports = async MFBGB => {
         role.expire_task_id = expireTaskId;
         updateLoadedRole(roleId, role);
 
-        MFBGB.db.subscribableRolesDB.run(
+        client.db.subscribableRolesDB.run(
           'UPDATE roles SET expire_at = $expire_at, expire_task_id = $expire_task_id WHERE id = $id',
           {$expire_at: strExpireAt, $expire_task_id: expireTaskId, $id: role.id},
           err => {
             if (err) reject(err);
 
-            MFBGB.Logger.log(`|SubscribableRole| Set the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
+            client.Logger.log(`|SubscribableRole| Set the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
             resolve();
           }
         );
@@ -229,20 +229,20 @@ module.exports = async MFBGB => {
     });
   };
 
-  MFBGB.BSDiscord.SubscribableRole.loadRoleById = async id => {
-    const role = await MFBGB.BSDiscord.SubscribableRole.getRoleById(id);
+  client.BSDiscord.SubscribableRole.loadRoleById = async id => {
+    const role = await client.BSDiscord.SubscribableRole.getRoleById(id);
     if (!role) {
       const err = `The subscribable role (${id}) isn't registered in the 'roles' table`;
       throw new Error(err);
     }
 
     if (role.roleObj === null) {
-      await MFBGB.BSDiscord.SubscribableRole.setStatus(id, 'deleted');
-      MFBGB.Logger.warn(`|SubscribableRole| The role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) seems to have been deleted from the guild (${role.role_guild_id}). Set its status for 'deleted'`);
+      await client.BSDiscord.SubscribableRole.setStatus(id, 'deleted');
+      client.Logger.warn(`|SubscribableRole| The role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) seems to have been deleted from the guild (${role.role_guild_id}). Set its status for 'deleted'`);
       return;
     }
 
-    if (MFBGB.BSDiscord.SubscribableRole.loadedRoles.has(id)) {
+    if (client.BSDiscord.SubscribableRole.loadedRoles.has(id)) {
       const err = `The subscribable role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) has already been loaded`;
       throw new Error(err);
     }
@@ -252,32 +252,32 @@ module.exports = async MFBGB => {
       throw new Error(err);
     }
 
-    MFBGB.BSDiscord.SubscribableRole.loadedRoles.set(id, role);
-    MFBGB.Logger.log(`|SubscribableRole| Re-registered the role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) to the MFBGB`);
+    client.BSDiscord.SubscribableRole.loadedRoles.set(id, role);
+    client.Logger.log(`|SubscribableRole| Re-registered the role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) to the client`);
   };
 
-  MFBGB.BSDiscord.SubscribableRole.loadOngoingRoles = async () => {
-    MFBGB.db.subscribableRolesDB.parallelize(() => {
-      MFBGB.db.subscribableRolesDB.each(
+  client.BSDiscord.SubscribableRole.loadOngoingRoles = async () => {
+    client.db.subscribableRolesDB.parallelize(() => {
+      client.db.subscribableRolesDB.each(
         'SELECT id FROM roles WHERE status IS NULL',
         {},
         (err, row) => {
           if (err) {
-            MFBGB.Logger.error(`|SubscribableRole| An error occurred during getting ongoing roles from the roles table: ${err}`);
+            client.Logger.error(`|SubscribableRole| An error occurred during getting ongoing roles from the roles table: ${err}`);
             return;
           }
           try {
-            MFBGB.BSDiscord.SubscribableRole.loadRoleById(row.id);
+            client.BSDiscord.SubscribableRole.loadRoleById(row.id);
           } catch (e) {
-            MFBGB.Logger.error(`|SubscribableRole| An error occurred during loading an ongoing role: ${e}`);
+            client.Logger.error(`|SubscribableRole| An error occurred during loading an ongoing role: ${e}`);
           }
         }
       );
     });
   };
 
-  MFBGB.BSDiscord.SubscribableRole.subscribe = async (roleId, member) => {
-    const role = MFBGB.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
+  client.BSDiscord.SubscribableRole.subscribe = async (roleId, member) => {
+    const role = client.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
 
     if (!role) {
       const err = `The id ${roleId} is invalid`;
@@ -285,12 +285,12 @@ module.exports = async MFBGB => {
     }
 
     return member.addRole(role.roleObj.id, 'Subscribe a subscribable role').then(m => {
-      MFBGB.Logger.log(`|SubscribableRole| Added the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) to ${m.user.tag}(${m.user.id})`);
+      client.Logger.log(`|SubscribableRole| Added the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) to ${m.user.tag}(${m.user.id})`);
     });
   };
 
-  MFBGB.BSDiscord.SubscribableRole.unsubscribe = async (roleId, member) => {
-    const role = MFBGB.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
+  client.BSDiscord.SubscribableRole.unsubscribe = async (roleId, member) => {
+    const role = client.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
 
     if (!role) {
       const err = `The id ${roleId} is invalid`;
@@ -298,12 +298,12 @@ module.exports = async MFBGB => {
     }
 
     return member.removeRole(role.roleObj.id, 'Unsubscribe a subscribable role').then(m => {
-      MFBGB.Logger.log(`|SubscribableRole| Removed the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) from ${m.user.tag}(${m.user.id})`);
+      client.Logger.log(`|SubscribableRole| Removed the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) from ${m.user.tag}(${m.user.id})`);
     });
   };
 
-  MFBGB.BSDiscord.SubscribableRole.expire = async roleId => {
-    const role = MFBGB.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
+  client.BSDiscord.SubscribableRole.expire = async roleId => {
+    const role = client.BSDiscord.SubscribableRole.loadedRoles.get(roleId);
 
     if (!role) {
       const err = `The id ${roleId} is invalid`;
@@ -311,10 +311,10 @@ module.exports = async MFBGB => {
     }
 
     return role.roleObj.delete('Expire a subscribable role').then(async r => {
-      await MFBGB.BSDiscord.SubscribableRole.setStatus(roleId, 'expired');
-      MFBGB.BSDiscord.SubscribableRole.loadedRoles.delete(roleId);
+      await client.BSDiscord.SubscribableRole.setStatus(roleId, 'expired');
+      client.BSDiscord.SubscribableRole.loadedRoles.delete(roleId);
 
-      MFBGB.Logger.log(`|SubscribableRole| The role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) has expired`);
+      client.Logger.log(`|SubscribableRole| The role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) has expired`);
     });
   };
 
@@ -327,13 +327,13 @@ module.exports = async MFBGB => {
 
   await Promise.all(
     tables.map(t => {
-      return dbCtrl.tableExists(MFBGB, MFBGB.db.subscribableRolesDB, t.name).then(exist => {
+      return dbCtrl.tableExists(client, client.db.subscribableRolesDB, t.name).then(exist => {
         if (!exist) {
-          dbCtrl.createTable(MFBGB, MFBGB.db.subscribableRolesDB, t.name, t.query);
+          dbCtrl.createTable(client, client.db.subscribableRolesDB, t.name, t.query);
         }
       });
     })
   );
 
-  MFBGB.BSDiscord.SubscribableRole.loadOngoingRoles();
+  client.BSDiscord.SubscribableRole.loadOngoingRoles();
 };

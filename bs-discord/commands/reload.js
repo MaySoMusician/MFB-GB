@@ -1,10 +1,10 @@
-exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-vars
+exports.run = async (client, message, args) => {// eslint-disable-line no-unused-vars
   if (args == false || args.size < 1) return message.reply('再読み込みしたいコマンドを指定してね。');
 
-  let response = await MFBGB.BSDiscord.unloadCommand(args[0]);
+  let response = await client.BSDiscord.unloadCommand(args[0]);
   if (response) return message.reply(`読込解除エラー: ${response}`);
 
-  response = MFBGB.BSDiscord.loadCommand(args[0]);
+  response = client.BSDiscord.loadCommand(args[0]);
   if (response) return message.reply(`読込エラー: ${response}`);
 
   message.reply(`\`${args[0]}\`コマンドは正常に再読み込みされました。`);

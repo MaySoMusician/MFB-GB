@@ -1,4 +1,4 @@
-module.exports = MFBGB => {
+module.exports = client => {
   /* MISCELLANEOUS NON-CRITICAL FUNCTIONS */
 
   /* eslint-disable no-extend-native */
@@ -24,19 +24,19 @@ module.exports = MFBGB => {
   });
   /* eslint-enable no-extend-native */
 
-  // `await MFBGB.wait(1000);` to "pause" for 1 second.
-  MFBGB.wait = require('util').promisify(setTimeout);
+  // `await client.wait(1000);` to "pause" for 1 second.
+  client.wait = require('util').promisify(setTimeout);
 
-  MFBGB.random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  client.random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-  MFBGB.getTextCnlIdByVoiceCnl = (guild, vc) => {
-    const vpg = MFBGB.vpg.getVPG(guild.id);
+  client.getTextCnlIdByVoiceCnl = (guild, vc) => {
+    const vpg = client.vpg.getVPG(guild.id);
     if (vpg && vpg.VC2TC) return vpg.VC2TC[vc.id];
     return null;
   };
 
-  MFBGB.getDefaultStreamingVoiceCnl = guild => {
-    const vpg = MFBGB.vpg.getVPG(guild.id);
+  client.getDefaultStreamingVoiceCnl = guild => {
+    const vpg = client.vpg.getVPG(guild.id);
     if (vpg) return vpg.defaultStreamingVC;
     return null;
   };
@@ -44,13 +44,13 @@ module.exports = MFBGB => {
   // These 2 process methods will catch exceptions and give *more details* about the error and stack trace.
   process.on('uncaughtException', err => {
     const errorMsg = err.stack.replace(new RegExp(`${__dirname}/`, 'g'), './');
-    MFBGB.Logger.error(`Uncaught Exception: ${errorMsg}`);
+    client.Logger.error(`Uncaught Exception: ${errorMsg}`);
     // Always best practice to let the code crash on uncaught exceptions.
     // Because you should be catching them anyway.
     process.exit(1);
   });
 
   process.on('unhandledRejection', err => {
-    MFBGB.Logger.error(`Unhandled rejection: ${err}`);
+    client.Logger.error(`Unhandled rejection: ${err}`);
   });
 };

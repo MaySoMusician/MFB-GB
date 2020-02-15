@@ -1,4 +1,4 @@
-module.exports = MFBGB => {
+module.exports = client => {
   const srcBase = 16,
         destBase = 64,
         srcBitLength = Math.log2(srcBase),
@@ -7,7 +7,7 @@ module.exports = MFBGB => {
         destChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUCVWXYZ+/',
         pad0 = (num, len) => ('0'.repeat(len) + num).substr(-len);
 
-  MFBGB.compHex = {
+  client.compHex = {
     compress: rawHex => {
       return rawHex.replace(/./g, e => pad0(srcChars.indexOf(e).toString(2), srcBitLength)).replace(
         new RegExp(`(.{1,${destBitLength}}$)|.{${destBitLength}}`, 'g'),

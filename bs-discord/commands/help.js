@@ -5,13 +5,13 @@ The help command is also filtered by level, so if a user does not have access to
 it is not shown to them. If a command name is given with the help command, its extended help is shown.
 */
 
-exports.run = (MFBGB, message, args) => {
+exports.run = (client, message, args) => {
   // If no specific command is called, show all filtered commands.
   if (!args[0]) {
     // Filter all commands by which are available for the user's level, using the <Collection>.filter() method.
     const myCommands = message.guild
-      ? MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel)
-      : MFBGB.BSDiscord.commands.filter(cmd => MFBGB.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel && cmd.conf.guildOnly !== true);
+      ? client.BSDiscord.commands.filter(cmd => client.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel)
+      : client.BSDiscord.commands.filter(cmd => client.BSDiscord.levelCache[cmd.conf.permLevel] <= message.author.permLevel && cmd.conf.guildOnly !== true);
 
     // Here we have to get the command names only, and we use that array to get the longest name.
     // This make the help commands "aligned" in the output.
@@ -19,7 +19,7 @@ exports.run = (MFBGB, message, args) => {
           longest = commandNames.reduce((long, str) => Math.max(long, str.length), 0);
 
     let currentCategory = '',
-        output = `= コマンド一覧 =\n\n[${MFBGB.config.prefix['BSDiscord']}help <コマンド名> で詳細表示]\n`;
+        output = `= コマンド一覧 =\n\n[${client.config.prefix['BSDiscord']}help <コマンド名> で詳細表示]\n`;
     /* eslint-disable */
     const sorted = myCommands.array().sort((p, c) => p.help.category > c.help.category
                                                      ? 1 // eslint-disable-line
@@ -31,7 +31,7 @@ exports.run = (MFBGB, message, args) => {
         output += `\u200b\n== ${cat} ==\n`;
         currentCategory = cat;
       }
-      output += `${MFBGB.config.prefix['BSDiscord']}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}\n`;
+      output += `${client.config.prefix['BSDiscord']}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}\n`;
     });
     message.channel.send(output, {
       code: 'asciidoc',
@@ -40,9 +40,9 @@ exports.run = (MFBGB, message, args) => {
   } else {
     // Show individual command's help.
     let command = args[0];
-    if (MFBGB.BSDiscord.commands.has(command)) {
-      command = MFBGB.BSDiscord.commands.get(command);
-      if (message.author.permLevel < MFBGB.BSDiscord.levelCache[command.conf.permLevel]) return; // if you don't have enough permission, you'll be ignored
+    if (client.BSDiscord.commands.has(command)) {
+      command = client.BSDiscord.commands.get(command);
+      if (message.author.permLevel < client.BSDiscord.levelCache[command.conf.permLevel]) return; // if you don't have enough permission, you'll be ignored
       /* eslint-disable no-irregular-whitespace */
       message.channel.send(
         `= ${command.help.name} =

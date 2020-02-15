@@ -5,25 +5,25 @@ const ytdl = require('ytdl-core');
  * Note 2. Argument destructuring is easy to call a function when it's dequeued, though it's uneasy to read source codes
  */
 
-module.exports = MFBGB => {
+module.exports = client => {
   // Registers a destructor to the voice dispatcher binding to the guild
   const _registerDestructor = (guild, cnc) => {
-    const data = MFBGB.MusicPlayer.data[guild.id];
+    const data = client.MusicPlayer.data[guild.id];
     data.disp.on('end', reason => { // When the music stops
-      MFBGB.MusicPlayer.utils.resetData(guild.id); // Reset dispatcher and volume
-      if (data.autonext) MFBGB.MusicPlayer.cmds.dequeue(guild); // Automatically start the next music in the queue if autonext enabled
+      client.MusicPlayer.utils.resetData(guild.id); // Reset dispatcher and volume
+      if (data.autonext) client.MusicPlayer.cmds.dequeue(guild); // Automatically start the next music in the queue if autonext enabled
     });
 
     if (cnc.listenerCount('disconnect') < 1) {
       cnc.on('disconnect', () => {
-        let disp = MFBGB.MusicPlayer.data[guild.id].disp;
+        let disp = client.MusicPlayer.data[guild.id].disp;
         if (disp) disp.end('Disconnected the voice connection somehow.');
       });
     }
   };
 
   // Plays the music from YouTube. seek is considered as seconds; vol is 0.01 by default
-  MFBGB.MusicPlayer.cmds.playYouTube = async ({ // Argument destructuring is easy to call a function when it's dequeued, though it's uneasy to read source codes
+  client.MusicPlayer.cmds.playYouTube = async ({ // Argument destructuring is easy to call a function when it's dequeued, though it's uneasy to read source codes
     guild,
     cnl,
     movieID,
@@ -34,9 +34,9 @@ module.exports = MFBGB => {
 
     // Now vol is a number even if we received vol as a string
 
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (data.disp !== null) {
-      await MFBGB.MusicPlayer.cmds.stop({ // When another music is already playing
+      await client.MusicPlayer.cmds.stop({ // When another music is already playing
         guild: guild,
         reason: 'Starting another YouTube movie',
       });
@@ -44,7 +44,7 @@ module.exports = MFBGB => {
 
     cnl.join().then(async cnc => {
       const ytStream = ytdl('https://www.youtube.com/watch?v=' + movieID, {filter: 'audioonly'});
-      await MFBGB.wait(100); // Just to be safe
+      await client.wait(100); // Just to be safe
 
       data.disp = cnc.playStream(ytStream, { // Let's play the music!
         seek: seek,
@@ -58,7 +58,7 @@ module.exports = MFBGB => {
   };
 
   // Plays the music from local files. seek is considered as seconds; vol is 0.01 by default
-  MFBGB.MusicPlayer.cmds.playFileByName = async ({
+  client.MusicPlayer.cmds.playFileByName = async ({
     guild,
     cnl,
     fileName,
@@ -69,9 +69,9 @@ module.exports = MFBGB => {
 
     // Now vol is a number even if we received vol as a string
 
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (data.disp !== null) {
-      await MFBGB.MusicPlayer.cmds.stop({ // When another music is already playing
+      await client.MusicPlayer.cmds.stop({ // When another music is already playing
         guild: guild,
         reason: 'Starting another music from a local file',
       });
@@ -91,19 +91,19 @@ module.exports = MFBGB => {
   };
 
   // Plays the music from local files, specifying by an alias. seek is considered as seconds; vol is 0.01 by default
-  MFBGB.MusicPlayer.cmds.playFileByAlias = async ({
+  client.MusicPlayer.cmds.playFileByAlias = async ({
     guild,
     cnl,
     alias,
     opts: {seek = 0, vol = 0.01},
     funcOnStart,
   }) => {
-    if (!(alias in MFBGB.MusicPlayer.sounds)) throw new TypeError("Invalid 'alias'");
+    if (!(alias in client.MusicPlayer.sounds)) throw new TypeError("Invalid 'alias'");
 
-    MFBGB.MusicPlayer.cmds.playFileByName({
+    client.MusicPlayer.cmds.playFileByName({
       guild: guild,
       cnl: cnl,
-      fileName: MFBGB.MusicPlayer.sounds[alias].fileName,
+      fileName: client.MusicPlayer.sounds[alias].fileName,
       opts: {seek: seek, vol: vol},
       funcOnStart: funcOnStart,
     });
@@ -179,17 +179,17 @@ module.exports = MFBGB => {
   };*/
 
   // Places a command with an argument object in the queue by the guild
-  MFBGB.MusicPlayer.cmds.enqueue = (cmdName, cmdArgs) => {
-    MFBGB.MusicPlayer.data[cmdArgs.guild.id].queue.push({cmdName: cmdName, cmdArgs: cmdArgs});
+  client.MusicPlayer.cmds.enqueue = (cmdName, cmdArgs) => {
+    client.MusicPlayer.data[cmdArgs.guild.id].queue.push({cmdName: cmdName, cmdArgs: cmdArgs});
   };
 
   // Executes the next command in the queue by the guild
-  MFBGB.MusicPlayer.cmds.dequeue = guild => {
-    let data = MFBGB.MusicPlayer.data[guild.id];
+  client.MusicPlayer.cmds.dequeue = guild => {
+    let data = client.MusicPlayer.data[guild.id];
     if (data.queue.length < 1) return false; // When the queue is empty
 
     let {cmdName, cmdArgs} = data.queue.shift();
-    MFBGB.MusicPlayer.cmds[cmdName](cmdArgs); // We can call a function this way thanks to argument destructuring!
+    client.MusicPlayer.cmds[cmdName](cmdArgs); // We can call a function this way thanks to argument destructuring!
     return true;
   };
 
@@ -207,8 +207,8 @@ module.exports = MFBGB => {
   }*/
 
   // Sets 'autonext' flag by the guild
-  MFBGB.MusicPlayer.cmds.setAutonext = (guild, value) => {
-    MFBGB.MusicPlayer.data[guild.id].autonext = value;
+  client.MusicPlayer.cmds.setAutonext = (guild, value) => {
+    client.MusicPlayer.data[guild.id].autonext = value;
   };
 
   /* let setAutonext = (guild, value) => {
@@ -217,16 +217,16 @@ module.exports = MFBGB => {
   };*/
 
   // Stops the music that is currently playing. If fadeTime is 0, the music will stop suddenly; otherwise, it'll stop after turning down its volume gradually
-  MFBGB.MusicPlayer.cmds.stop = async ({
+  client.MusicPlayer.cmds.stop = async ({
     guild,
     fadeTime = 2000,
     reason = 'Just stop music - no reasons provided',
   }) => {
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (!data.disp) throw new Error("Somehow the StreamDispatcher doesn't exist properly");
 
     if (fadeTime !== 0) {
-      await MFBGB.MusicPlayer.cmds.fadeVol({
+      await client.MusicPlayer.cmds.fadeVol({
         guild: guild,
         destVol: 0,
         fadeTime: fadeTime,
@@ -240,15 +240,15 @@ module.exports = MFBGB => {
 
   // Pasues the music that is currently playing. If fadeTime is 0, the music will stop suddenly; otherwise, it'll stop after turning down its volume gradually
   // Of couse, you can resume it later.
-  MFBGB.MusicPlayer.cmds.pause = async ({
+  client.MusicPlayer.cmds.pause = async ({
     guild,
     fadeTime = 1000,
   }) => {
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (!data.disp) throw new Error("Somehow the StreamDispatcher doesn't exist properly");
 
     if (fadeTime !== 0) {
-      await MFBGB.MusicPlayer.cmds.fadeVol({
+      await client.MusicPlayer.cmds.fadeVol({
         guild: guild,
         destVol: 0,
         fadeTime: fadeTime,
@@ -273,31 +273,31 @@ module.exports = MFBGB => {
   };*/
 
   // Resumes the music that was playing before. If fadeTime is 0, the music will resume suddenly; otherwise, it'll resume while turning up its volume gradually
-  MFBGB.MusicPlayer.cmds.resume = async ({
+  client.MusicPlayer.cmds.resume = async ({
     guild,
     fadeTime = 1000,
   }) => {
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (!data.disp) throw new Error("Somehow the StreamDispatcher doesn't exist properly");
 
     let destVol = data.vol;
     if (fadeTime === 0) {
       data.disp.resume();
-      MFBGB.MusicPlayer.cmds.changeVol({
+      client.MusicPlayer.cmds.changeVol({
         guild: guild,
         destVol: destVol,
         dry: false,
       });
     } else { // With volume fading in
       data.disp.resume();
-      MFBGB.MusicPlayer.cmds.changeVol({
+      client.MusicPlayer.cmds.changeVol({
         guild: guild,
         destVol: 0,
         dry: true,
       });
 
-      await MFBGB.wait(200); // idk if this's necessary
-      await MFBGB.MusicPlayer.cmds.fadeVol({
+      await client.wait(200); // idk if this's necessary
+      await client.MusicPlayer.cmds.fadeVol({
         guild: guild,
         destVol: destVol,
         fadeTime: 1500,
@@ -318,12 +318,12 @@ module.exports = MFBGB => {
   }*/
 
   // Changes the volume. If dry is true, this will NOT change data[GuildID].vol.
-  MFBGB.MusicPlayer.cmds.changeVol = ({
+  client.MusicPlayer.cmds.changeVol = ({
     guild,
     destVol,
     dry,
   }) => {
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (!data.disp) throw new Error("Somehow the StreamDispatcher doesn't exist properly");
     if (isNaN(destVol = destVol - 0)) throw new TypeError("'destVol' argument must be converted to a number");
 
@@ -347,13 +347,13 @@ module.exports = MFBGB => {
   }*/
 
   // Changes the volume with fade. If dry is true, this will NOT change data[GuildID].vol.
-  MFBGB.MusicPlayer.cmds.fadeVol = ({
+  client.MusicPlayer.cmds.fadeVol = ({
     guild,
     destVol,
     fadeTime,
     dry,
   }) => {
-    let data = MFBGB.MusicPlayer.data[guild.id];
+    let data = client.MusicPlayer.data[guild.id];
     if (!data.disp) throw new Error("Somehow the StreamDispatcher doesn't exist properly");
     if (isNaN(destVol = destVol - 0)) throw new TypeError("'destVol' argument must be converted to a number");
 
@@ -370,19 +370,19 @@ module.exports = MFBGB => {
       for (let i = 0; i < freq; i++) {
         fVol += step;
 
-        // if(data.disp) will NOT work because data won't be overwritten to null when 'MFBGB.MusicPlayer.data[guild.id].disp = null'
-        if (MFBGB.MusicPlayer.data[guild.id].disp) data.disp.setVolume(fVol);
+        // if(data.disp) will NOT work because data won't be overwritten to null when 'client.MusicPlayer.data[guild.id].disp = null'
+        if (client.MusicPlayer.data[guild.id].disp) data.disp.setVolume(fVol);
         else break;
 
-        await MFBGB.wait(wait);
+        await client.wait(wait);
       }
-      if (MFBGB.MusicPlayer.data[guild.id].disp) data.disp.setVolume(destVol);
+      if (client.MusicPlayer.data[guild.id].disp) data.disp.setVolume(destVol);
       resolve();
     });
   };
 
-  MFBGB.MusicPlayer.cmds.forceReset = guild => {
-    MFBGB.BSDiscord.voiceConnections.find(c => c.channel.guild.id === guild.id).disconnect();
+  client.MusicPlayer.cmds.forceReset = guild => {
+    client.BSDiscord.voiceConnections.find(c => c.channel.guild.id === guild.id).disconnect();
   };
 
   /* let fade = (guild, vol, fadeSpan, prevVirtualVolChange) => {

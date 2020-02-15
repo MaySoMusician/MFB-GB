@@ -1,4 +1,4 @@
-exports.run = async (MFBGB, message, args) => {
+exports.run = async (client, message, args) => {
   const Discord = require('discord.js'),
         wr = require('../../underside/webRequester.js'),
         REGEX_WIKIPEDIA = /<?https?:\/\/([\w]*)+\.(?:m\.)?wikipedia.org\/wiki\/([^?\s\t\v>]*)(?:\?.*=.*)?>?/, // URL to Wikipedia
@@ -6,7 +6,7 @@ exports.run = async (MFBGB, message, args) => {
 
   /* eslint-disable one-var */
   const getPageData = (lang, pageName) => {
-    return wr.fetch(MFBGB, 'https://' + lang + '.wikipedia.org/wiki/' + pageName, {})
+    return wr.fetch(client, 'https://' + lang + '.wikipedia.org/wiki/' + pageName, {})
       .then(res => {
         if (!res) return null;
 
@@ -115,7 +115,7 @@ exports.run = async (MFBGB, message, args) => {
         .setColor([79, 84, 92])
         .setDescription('エラー: 記事を読み込めませんでした。')
         .setTimestamp()
-        .setFooter('Wikipedia Summarizer', MFBGB.BSDiscord.user.displayAvatarURL)
+        .setFooter('Wikipedia Summarizer', client.BSDiscord.user.displayAvatarURL)
     );
   } else if (pageElements.error) {
     // If we have some error infomation, show it to the user
@@ -126,7 +126,7 @@ exports.run = async (MFBGB, message, args) => {
         .setColor([79, 84, 92])
         .setDescription('エラー: 記事を読み込めませんでした。')
         .setTimestamp()
-        .setFooter('Wikipedia Summarizer', MFBGB.BSDiscord.user.displayAvatarURL)
+        .setFooter('Wikipedia Summarizer', client.BSDiscord.user.displayAvatarURL)
         .addField('Code', pageElements.error.code, true)
         .addField('Message', pageElements.error.message, true)
     );
@@ -183,7 +183,7 @@ exports.run = async (MFBGB, message, args) => {
       .setAuthor(message.member.displayName, message.author.displayAvatarURL)
       .setColor([0, 102, 153]) // the color of Wikimedia
       .setDescription(desc)
-      .setFooter('Wikipedia Summarizer', MFBGB.BSDiscord.user.displayAvatarURL)
+      .setFooter('Wikipedia Summarizer', client.BSDiscord.user.displayAvatarURL)
       .setImage(imageURL)
       .setThumbnail('https://' + lang + '.wikipedia.org/static/images/project-logos/' + lang + 'wiki.png')
       .setTimestamp()

@@ -1,4 +1,4 @@
-exports.run = async (MFBGB, message, args) => {
+exports.run = async (client, message, args) => {
   message.delete().catch(e => {
     console.error(e);
   });
@@ -23,16 +23,16 @@ exports.run = async (MFBGB, message, args) => {
 
     if (radioVoiceCnl === null) {
       // Get the default voice channel per guild, even if the sender is NOT in any voice channels
-      const defaultVoiveCnlId = MFBGB.getDefaultStreamingVoiceCnl(g);
+      const defaultVoiveCnlId = client.getDefaultStreamingVoiceCnl(g);
       if (defaultVoiveCnlId) {
         radioVoiceCnl = g.channels.get(defaultVoiveCnlId);
       } else {
         // End the command because we don't find the channel to manage
-        MFBGB.Logger.warn(`|BS-Discord| Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`);
+        client.Logger.warn(`|BS-Discord| Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`);
         return false;
       }
     }
-    // radioTextCnlID = MFBGB.getTextCnlIdByVoiceCnl(g, radioVoiceCnl);
+    // radioTextCnlID = client.getTextCnlIdByVoiceCnl(g, radioVoiceCnl);
     // if (radioTextCnlID) radioTextCnl = g.channels.get(radioTextCnlID);
     return true;
   };
@@ -67,9 +67,9 @@ exports.run = async (MFBGB, message, args) => {
       {'CONNECT': true},
       'Started a radio program'
     ).then(() => {
-      MFBGB.Logger.log(`|BS-Discord| Opened the voice channel '${radioVoiceCnl.name}'`);
+      client.Logger.log(`|BS-Discord| Opened the voice channel '${radioVoiceCnl.name}'`);
     }).catch(e => {
-      MFBGB.Logger.error(`|BS-Discord| Failed to open the voice channel: 'e'`);
+      client.Logger.error(`|BS-Discord| Failed to open the voice channel: 'e'`);
     });
   };
 
@@ -82,9 +82,9 @@ exports.run = async (MFBGB, message, args) => {
       {'CONNECT': false},
       'Ended a radio program'
     ).then(() => {
-      MFBGB.Logger.log(`|BS-Discord| Closed the voice channel '${radioVoiceCnl.name}'`);
+      client.Logger.log(`|BS-Discord| Closed the voice channel '${radioVoiceCnl.name}'`);
     }).catch(e => {
-      MFBGB.Logger.error(`|BS-Discord| Failed to close the voice channel: 'e'`);
+      client.Logger.error(`|BS-Discord| Failed to close the voice channel: 'e'`);
     });
   };
 

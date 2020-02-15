@@ -1,5 +1,5 @@
-module.exports = MFBGB => {
-  MFBGB.emojisByName = {
+module.exports = client => {
+  client.emojisByName = {
     'stopwatch': '\u23f1',
     'timer': '\u23f2',
     'information_source': '\u2139',

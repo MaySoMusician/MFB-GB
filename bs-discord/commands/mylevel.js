@@ -1,5 +1,5 @@
-exports.run = async (MFBGB, message, args) => {
-  const friendly = MFBGB.config.permLevels.find(l => l.level === message.author.permLevel).name;
+exports.run = async (client, message, args) => {
+  const friendly = client.config.permLevels.find(l => l.level === message.author.permLevel).name;
   message.reply(`あなたの権限レベル: ${message.author.permLevel} - ${friendly}`);
 };
 

@@ -1,19 +1,19 @@
 // const moment = require('moment');
 
-module.exports = MFBGB => {
+module.exports = client => {
   const contextReady = {
     'none': {
       check: true,
       planB: () => void 0,
     },
     'BSDiscord': {
-      check: () => MFBGB.BSDiscord.ready,
+      check: () => client.BSDiscord.ready,
       planB: (taskWrapper, id, ...args) => {
-        MFBGB.BSDiscord.on('ready', (async MFBGB => {
-          await MFBGB.wait(1000);
+        client.BSDiscord.on('ready', (async client => {
+          await client.wait(1000);
           taskWrapper(id, ...args);
-        }).bind(null, MFBGB));
-        MFBGB.Logger.warn(`|Scheduler| The task (${id}) will wait for BSDiscord to get ready`);
+        }).bind(null, client));
+        client.Logger.warn(`|Scheduler| The task (${id}) will wait for BSDiscord to get ready`);
       },
     },
   };

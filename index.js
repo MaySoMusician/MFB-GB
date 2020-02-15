@@ -3,22 +3,22 @@
 if (process.version.slice(1).split('.')[0] < 8) throw new Error('Node 8.0.0 or higher is required. Update Node on your system.');
 
 // The root of everything
-const MFBGB = {};
+const client = {};
 
 // Initialize basic functions
-require('./underside/basic.js')(MFBGB);
+require('./underside/basic.js')(client);
 
 // Compressed Hexdecimal
-require('./underside/compressedHex.js')(MFBGB);
+require('./underside/compressedHex.js')(client);
 
 // Initialize console logger
-MFBGB.Logger = require('./underside/logger.js');
+client.Logger = require('./underside/logger.js');
 
 // Load common settings
 try {
-  MFBGB.config = require('./config.js');
+  client.config = require('./config.js');
 } catch (_) {
-  MFBGB.config = {
+  client.config = {
     // Bot Owner, level 9 by default. A User ID. Should never be anything else than the bot owner's ID.
     ownerID: process.env.OWNER_ID,
 
@@ -48,17 +48,17 @@ try {
 }
 
 // Load settings per guild
-MFBGB.vpg = require('./valuePerGuild.js');
-MFBGB.vpg.getVPG = gID => {
-  if (gID in MFBGB.vpg) return MFBGB.vpg[gID];
+client.vpg = require('./valuePerGuild.js');
+client.vpg.getVPG = gID => {
+  if (gID in client.vpg) return client.vpg[gID];
   else return null;
 };
 
 // Initialize Emojis
-require('./underside/emojis.js')(MFBGB);
+require('./underside/emojis.js')(client);
 
 // Initialize Broadcasting System on Discord
-require('./bs-discord/main.js')(MFBGB);
+require('./bs-discord/main.js')(client);
 
 // Initialize the task scheduler
-require('./underside/scheduler.js')(MFBGB);
+require('./underside/scheduler.js')(client);

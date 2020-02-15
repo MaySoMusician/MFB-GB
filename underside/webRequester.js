@@ -4,22 +4,22 @@ const querystring = require('querystring'),
       ch = require('cheerio-httpcli');
       // USERAGENT = 'Request-Promise-Native/1.0.5';
 
-const get = (MFBGB, uri, queryStrings, parseJson) => {
+const get = (client, uri, queryStrings, parseJson) => {
   const userAgent = 'Request-Promise-Native/1.0.5';
   // Format query string for logging debug information
   const strQueryString = querystring.stringify(queryStrings);
 
-  MFBGB.Logger.debug(`|WebRequester| Get: ${uri}`);
-  MFBGB.Logger.debug(`|WebRequester| ${strQueryString === '' ? '(no query string)': '?' + strQueryString}`);
-  MFBGB.Logger.debug(`|WebRequester| user-agent: ${userAgent}, parseJson: ${parseJson}`);
+  client.Logger.debug(`|WebRequester| Get: ${uri}`);
+  client.Logger.debug(`|WebRequester| ${strQueryString === '' ? '(no query string)': '?' + strQueryString}`);
+  client.Logger.debug(`|WebRequester| user-agent: ${userAgent}, parseJson: ${parseJson}`);
 
   return rpn({uri: uri, qs: queryStrings, headers: {'User-Agent': userAgent}, json: parseJson}).then(res => {
-    MFBGB.Logger.debug(`|WebRequester| Get: Successful`);
+    client.Logger.debug(`|WebRequester| Get: Successful`);
     return res;
-  }).catch(e => MFBGB.Logger.error(`|WebRequester| Get: Failed: ${e}`));
+  }).catch(e => client.Logger.error(`|WebRequester| Get: Failed: ${e}`));
 };
 
-const fetch = (MFBGB, uri, queryStrings, encode = undefined) => {
+const fetch = (client, uri, queryStrings, encode = undefined) => {
   const userAgent = 'Cheerio-Httpcli/0.7.3';
   ch.reset();
   ch.set('headers', {'User-Agent': userAgent});
@@ -28,14 +28,14 @@ const fetch = (MFBGB, uri, queryStrings, encode = undefined) => {
   // Format query string for logging debug information
   const strQueryString = querystring.stringify(queryStrings);
 
-  MFBGB.Logger.debug(`|WebRequester| Fetch: ${uri}`);
-  MFBGB.Logger.debug(`|WebRequester| ${strQueryString === '' ? '(no query string)': '?' + strQueryString}`);
-  MFBGB.Logger.debug(`|WebRequester| user-agent: ${userAgent}`);
+  client.Logger.debug(`|WebRequester| Fetch: ${uri}`);
+  client.Logger.debug(`|WebRequester| ${strQueryString === '' ? '(no query string)': '?' + strQueryString}`);
+  client.Logger.debug(`|WebRequester| user-agent: ${userAgent}`);
 
   return ch.fetch(uri, queryStrings, encode).then(res => {
-    MFBGB.Logger.debug(`|WebRequester| Fetch: Successful`);
+    client.Logger.debug(`|WebRequester| Fetch: Successful`);
     return res;
-  }).catch(e => MFBGB.Logger.error(`|WebRequester| Fetch: Failed: ${e}`));
+  }).catch(e => client.Logger.error(`|WebRequester| Fetch: Failed: ${e}`));
 };
 
 module.exports = {

@@ -1,24 +1,24 @@
 const dbCtrl = require('../../underside/dbCtrl.js');
 
-exports.run = async (MFBGB, message, args) => {// eslint-disable-line no-unused-vars
-  MFBGB.BSDiscord.ready = false;
-  // await MFBGB.wait(100);
+exports.run = async (client, message, args) => {// eslint-disable-line no-unused-vars
+  client.BSDiscord.ready = false;
+  // await client.wait(100);
   const msgDying = await message.reply('再起動します');
 
-  MFBGB.BSDiscord.commands.forEach(async cmd => {
-    await MFBGB.BSDiscord.unloadCommand(cmd);
+  client.BSDiscord.commands.forEach(async cmd => {
+    await client.BSDiscord.unloadCommand(cmd);
   });
 
   const promisesClosingDatabase = [];
 
-  for (const dbName in MFBGB.db) { // eslint-disable-line guard-for-in
-    promisesClosingDatabase.push(dbCtrl.closeDatabase(MFBGB, MFBGB.db[dbName]));
+  for (const dbName in client.db) { // eslint-disable-line guard-for-in
+    promisesClosingDatabase.push(dbCtrl.closeDatabase(client, client.db[dbName]));
   }
 
   await Promise.all(promisesClosingDatabase);
 
   msgDying.delete().then(()=> {
-    MFBGB.BSDiscord.user.setStatus('invisible');
+    client.BSDiscord.user.setStatus('invisible');
     process.exit(1);
   });
 };
