@@ -8,9 +8,6 @@ const client = {};
 // Initialize basic functions
 require('./underside/basic.js')(client);
 
-// Compressed Hexdecimal
-require('./underside/compressedHex.js')(client);
-
 // Initialize console logger
 client.logger = require('./underside/logger.js');
 

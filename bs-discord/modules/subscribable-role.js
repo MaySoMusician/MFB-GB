@@ -2,7 +2,8 @@ const // sqlite3 = require('sqlite3'),
       // sch = require('node-schedule'),
       moment = require('moment'),
       dbCtrl = require('../../underside/dbCtrl.js'),
-      path = require('path');
+      path = require('path'),
+      compressedHexadecimal = require('../../underside/compressedHex.js');
 require('moment-duration-format');
 
 module.exports = async client => {
@@ -79,7 +80,7 @@ module.exports = async client => {
       return Promise.reject(new Error(err));
     }
 
-    const compHexId = client.compHex.compress(numId.toString(16)),
+    const compHexId = compressedHexadecimal.compress(numId.toString(16)),
           name = `${alias}_${compHexId}`,
           neverExpired = dateExpireAt === null,
           strExpireAt = neverExpired ? null : moment(dateExpireAt).format('YYYY-MM-DD HH:mm:ss');
