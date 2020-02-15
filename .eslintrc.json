@@ -92,7 +92,7 @@
         "skipTemplates": true
       }
     ],
-    "require-jsdoc": "warn",
+    "require-jsdoc": "off",
     "node/exports-style": [
       "error",
       "module.exports"
