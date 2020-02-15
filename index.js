@@ -40,9 +40,6 @@ client.vpg.getVPG = gID => {
   else return null;
 };
 
-// Initialize Emojis
-require('./underside/emojis.js')(client);
-
 // Initialize Broadcasting System on Discord
 require('./bs-discord/main.js')(client);
 
