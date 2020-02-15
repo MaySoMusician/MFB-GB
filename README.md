@@ -18,7 +18,7 @@
 2. Clone or download this repositry.
 3. Install the dependencies by executing `npm install`.
 4. Copy `config.js.sample` in the root directory and rename it to `config.js`.
-5. Fill in `ownerID`, `token`, `logGuild`. You can change other settings the way you want.
+5. Fill in `ownerID`, `token`, `guildLogging`. You can change other settings the way you want.
 6. Run it by `node index.js`.
 
 As previously mentioned you will have to change the program for running on your environment.
