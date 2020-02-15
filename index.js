@@ -14,38 +14,27 @@ require('./underside/compressedHex.js')(client);
 // Initialize console logger
 client.Logger = require('./underside/logger.js');
 
-// Load common settings
-try {
-  client.config = require('./config.js');
-} catch (_) {
-  client.config = {
-    // Bot Owner, level 9 by default. A User ID. Should never be anything else than the bot owner's ID.
-    ownerID: process.env.OWNER_ID,
+// Load settings
+client.config = {};
 
-    // Staffs, level 5 by default. Array of user ID strings.
-    staffs: process.env.STAFFS,
+// A token of the bot. Check on https://discordapp.com/developers/applications/me
+client.config.token = process.env.TOKEN;
+if (!client.config.token) throw new Error('You must set the token of the bot');
 
-    // Bot's Token. Check on https://discordapp.com/developers/applications/me
-    token: process.env.TOKEN,
+// Bot Owner. A User ID of the bot owner.
+client.config.ownerId = process.env.OWNER_ID;
 
-    // A Discord guild the bot is targeting. A guild ID.
-    mainGuild: process.env.MAIN_GUILD,
+// Staffs. User ID strings separeted by semi-colons (no spaces).
+client.config.staff = process.env.STAFFS.split(';');
 
-    // A Discord guild for front-end logging. A guild ID.
-    logGuild: process.env.LOG_GUILD,
+// A Discord guild the bot targets. A guild ID.
+client.config.guildTargeted = process.env.GUILD_TARGETED;
 
-    // Discord guilds where bot's annoucements are posted. Array of guild ID strings.
-    announcementGuild: process.env.ANNOUNCEMENT_GUILD,
+// A Discord guild for front-end logging. A guild ID.
+client.config.guildLogging = process.env.GUILD_LOGGING;
 
-    darkskyApiKey: process.env.DARKSKY_API_KEY,
-
-    // Prefix of commands. Strings
-    prefix: process.env.PREFIX,
-
-    // PERMISSION LEVEL DEFINITIONS
-    permLevels: process.env.PERM_LEVELS,
-  };
-}
+// Prefix of commands. String.
+client.config.prefix = process.env.PREFIX;
 
 // Load settings per guild
 client.vpg = require('./valuePerGuild.js');
