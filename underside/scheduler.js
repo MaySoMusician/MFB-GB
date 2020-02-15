@@ -22,26 +22,26 @@ module.exports = async client => {
   const taskWrapper = async (id, context = 'none', cmd, params, note, postStatus = 'done', delayed = false) => {
     if (!contextReady[context].check) {
       contextReady[context].planB(taskWrapper, id, context, cmd, params, note, postStatus, delayed);
-      client.Logger.log(`|Scheduler| Didn't execute the task (${id}) due to unready context: ${context}`);
+      client.logger.log(`|Scheduler| Didn't execute the task (${id}) due to unready context: ${context}`);
       return false;
     }
-    client.Logger.log(`|Scheduler| Started the task (${id}) ${delayed ? 'belately': 'punctually'} with the context of ${context}`);
-    client.Logger.debug(`cmd: ${cmd}, params: ${params}, note: ${note}, postStatus: ${postStatus}, delayed: ${delayed}`);
+    client.logger.log(`|Scheduler| Started the task (${id}) ${delayed ? 'belately': 'punctually'} with the context of ${context}`);
+    client.logger.debug(`cmd: ${cmd}, params: ${params}, note: ${note}, postStatus: ${postStatus}, delayed: ${delayed}`);
 
     const result = await tasks[cmd](params);
 
     if (result) {
-      client.Logger.log(`|Scheduler| Successfully finished the task (${id})`);
+      client.logger.log(`|Scheduler| Successfully finished the task (${id})`);
     } else {
-      client.Logger.warn(`|Scheduler| It seemed to fail in the task (${id})`);
+      client.logger.warn(`|Scheduler| It seemed to fail in the task (${id})`);
       postStatus = postStatus + '-failed';
-      client.Logger.debug(`|Scheduler| Set 'postStatus' to ${postStatus} on a trial basis`);
+      client.logger.debug(`|Scheduler| Set 'postStatus' to ${postStatus} on a trial basis`);
     }
 
     client.Scheduler.setStatusById(id, postStatus, 'both').then(() => {
-      client.Logger.log(`|Scheduler| Set the status of the task (${id}) to ${postStatus}`);
+      client.logger.log(`|Scheduler| Set the status of the task (${id}) to ${postStatus}`);
     }).catch(err => {
-      client.Logger.error(`|Scheduler| Couldn't set the status of the task (${id}): ${err}`);
+      client.logger.error(`|Scheduler| Couldn't set the status of the task (${id}): ${err}`);
     });
     client.Scheduler.scheduledTasks.delete(id);
     return result;
@@ -53,7 +53,7 @@ module.exports = async client => {
     const task = await client.Scheduler.getTaskById(id, from);
     if (!task) {
       const err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
-      // client.Logger.error(`|Scheduler| ${err}`);
+      // client.logger.error(`|Scheduler| ${err}`);
       return Promise.reject(new Error(err));
     }
 
@@ -78,7 +78,7 @@ module.exports = async client => {
           task = await client.Scheduler.getTaskById(id, 'both');
     if (task) {
       const err = `The id '${id}' has been used for another task - no task can exist with the same id as another one`;
-      // client.Logger.error(`|Scheduler| ${err}`);
+      // client.logger.error(`|Scheduler| ${err}`);
       return Promise.reject(new Error(err));
     }
 
@@ -88,7 +88,7 @@ module.exports = async client => {
           job = sch.scheduleJob(dateRunAt, taskWrapper.bind(null, id, context, cmd, params, note, 'done', false));
 
     client.Scheduler.scheduledTasks.set(id, job);
-    client.Logger.log(`|Scheduler| Registered the ${type} task (${id}) to the client Scheduler (in-memory dataset)`);
+    client.logger.log(`|Scheduler| Registered the ${type} task (${id}) to the client Scheduler (in-memory dataset)`);
 
     const paramsJson = JSON.stringify(params),
           tableName = isDelayable ? 'delayable_tasks' : 'time_critical_tasks';
@@ -124,10 +124,10 @@ module.exports = async client => {
         insertArgs,
         err => {
           if (err) {
-            client.Logger.error(`|Scheduler| Couldn't register the task (${id}) in the ${tableName} table: ${err}`);
+            client.logger.error(`|Scheduler| Couldn't register the task (${id}) in the ${tableName} table: ${err}`);
             reject(err);
           }
-          client.Logger.log(`|Scheduler| Successfully registered the task (${id}) in the ${tableName} table`);
+          client.logger.log(`|Scheduler| Successfully registered the task (${id}) in the ${tableName} table`);
           resolve(id);
         }
       );
@@ -170,7 +170,7 @@ module.exports = async client => {
     const task = await client.Scheduler.getTaskById(id, from);
     if (!task) {
       const err = `The task (${id}) isn't registered in ${ isDefinedTable(from) ? `the ${from} table` : 'neither of the tables' }`;
-      // client.Logger.error(err);
+      // client.logger.error(err);
       // return Promise.reject(new Error(err));
       throw new Error(err);
     }
@@ -183,14 +183,14 @@ module.exports = async client => {
     if (client.Scheduler.scheduledTasks.has(id)) {
       const err = `The ${type} task (${id}) has been loaded - no tasks can be loaded more than once`;
       throw new Error(err);
-      // client.Logger.error(err);
+      // client.logger.error(err);
       // return Promise.reject(new Error(err));
     }
 
     if (task.status === 'done') {
       const err = `The ${type} task (${id}) has been finished - no task can be executed more than once`;
       throw new Error(err);
-      // client.Logger.error(err);
+      // client.logger.error(err);
       // return Promise.reject(new Error(err));
     }
 
@@ -199,7 +199,7 @@ module.exports = async client => {
     // momentReRunBy = momentRunAt.clone().add(task.delayed_for, 's');
 
     if (momentRunAt.isSameOrBefore(momentNow)) {
-      client.Logger.warn(`|Scheduler| The ${type} task (${id}) has expired`);
+      client.logger.warn(`|Scheduler| The ${type} task (${id}) has expired`);
       if (isDelayable) {
         const momentReRunBy = momentRunAt.clone().add(task.delayed_for, 's');
         if (task.delayed_for === 0 || momentReRunBy.isAfter(momentNow)) {
@@ -216,7 +216,7 @@ module.exports = async client => {
     const job = sch.scheduleJob(task.run_at, taskWrapper.bind(null, id, task.context, task.cmd, task.params, task.note, 'done', false));
 
     client.Scheduler.scheduledTasks.set(id, job);
-    client.Logger.log(`|Scheduler| Re-registered the ${type} task (${id}) to the client Scheduler (in-memory dataset)`);
+    client.logger.log(`|Scheduler| Re-registered the ${type} task (${id}) to the client Scheduler (in-memory dataset)`);
   };
 
   client.Scheduler.deleteTaskById = async (id, reason = null, from = 'both') => {
@@ -243,19 +243,19 @@ module.exports = async client => {
 
     client.Scheduler.scheduledTasks.get(task.id).cancel();
     client.Scheduler.scheduledTasks.delete(task.id);
-    client.Logger.log(`|Scheduler| Successfully canceled the job of the ${type} task (${id}), and deleted it from the client Scheduler (in-memory dataset)`);
+    client.logger.log(`|Scheduler| Successfully canceled the job of the ${type} task (${id}), and deleted it from the client Scheduler (in-memory dataset)`);
 
     client.Scheduler.setStatusById(id, 'deleted', from).then(() => {
-      client.Logger.log(`|Scheduler| Set the status of the ${type} task (${id}) for 'deleted'`);
+      client.logger.log(`|Scheduler| Set the status of the ${type} task (${id}) for 'deleted'`);
     }).catch(err => {
-      client.Logger.error(`|Scheduler| Couldn't set the status of the ${type} task (${id}): ${err}`);
+      client.logger.error(`|Scheduler| Couldn't set the status of the ${type} task (${id}): ${err}`);
     });
 
     if (reason !== null) {
       client.Scheduler.setNoteById(id, reason, from).then(() => {
-        client.Logger.log(`|Scheduler| Set the note of the ${type} task (${id}) for '${reason}' as deletion reason`);
+        client.logger.log(`|Scheduler| Set the note of the ${type} task (${id}) for '${reason}' as deletion reason`);
       }).catch(err => {
-        client.Logger.error(`|Scheduler| Couldn't set the note of the ${type} task (${id}): ${err}`);
+        client.logger.error(`|Scheduler| Couldn't set the note of the ${type} task (${id}): ${err}`);
       });
     }
   };
@@ -267,14 +267,14 @@ module.exports = async client => {
         {},
         (err, row) => {
           if (err) {
-            client.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the delayable_tasks table: ${err}`);
+            client.logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the delayable_tasks table: ${err}`);
             return;
           }
 
           try {
             client.Scheduler.loadTaskById(row.id, 'delayable_tasks');
           } catch (e) {
-            client.Logger.error(`|Scheduler| An error occurred during loading an unfinished delayable task: ${err}`);
+            client.logger.error(`|Scheduler| An error occurred during loading an unfinished delayable task: ${err}`);
           }
         }
       );
@@ -284,14 +284,14 @@ module.exports = async client => {
         {},
         (err, row) => {
           if (err) {
-            client.Logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the time_critical_tasks table: ${err}`);
+            client.logger.error(`|Scheduler| An error occurred during fetching unfinished tasks from the time_critical_tasks table: ${err}`);
             return;
           }
 
           try {
             client.Scheduler.loadTaskById(row.id, 'time_critical_tasks');
           } catch (e) {
-            client.Logger.error(`|Scheduler| An error occurred during loading an unfinished time-critical task: ${err}`);
+            client.logger.error(`|Scheduler| An error occurred during loading an unfinished time-critical task: ${err}`);
           }
         }
       );

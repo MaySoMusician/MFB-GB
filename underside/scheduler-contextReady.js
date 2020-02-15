@@ -13,7 +13,7 @@ module.exports = client => {
           await client.wait(1000);
           taskWrapper(id, ...args);
         }).bind(null, client));
-        client.Logger.warn(`|Scheduler| The task (${id}) will wait for BSDiscord to get ready`);
+        client.logger.warn(`|Scheduler| The task (${id}) will wait for BSDiscord to get ready`);
       },
     },
   };

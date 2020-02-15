@@ -64,7 +64,7 @@ ${message.content}
       }
       // If the command exists, **AND** the user has permission, run it.
       const strRequestedCmd = args.length === 0 ? cmd.help.name : `${cmd.help.name} ${args.join(' ').trim()}`;
-      client.Logger.cmd(`|BS-Discord| ${message.author.username}(${message.author.id}) as ${levelName} ran '${strRequestedCmd}'`);
+      client.logger.cmd(`|BS-Discord| ${message.author.username}(${message.author.id}) as ${levelName} ran '${strRequestedCmd}'`);
       cmd.run(client, message, args);
     }
   }

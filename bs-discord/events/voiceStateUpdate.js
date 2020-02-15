@@ -49,8 +49,8 @@ module.exports = (client, oldMember, newMember) => {
       radioTextCnl.send(joinMsg)
         .then(async msg => {
           msg.delete(wait4Del).catch(e => {
-            if (e.code === 10008) client.Logger.error(`|BS-Discord| The message has been deleted: ${e.path}`);
-            else client.Logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`);
+            if (e.code === 10008) client.logger.error(`|BS-Discord| The message has been deleted: ${e.path}`);
+            else client.logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`);
           });
         });
     };

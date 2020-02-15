@@ -12,7 +12,7 @@ require('./underside/basic.js')(client);
 require('./underside/compressedHex.js')(client);
 
 // Initialize console logger
-client.Logger = require('./underside/logger.js');
+client.logger = require('./underside/logger.js');
 
 // Load settings
 client.config = {};

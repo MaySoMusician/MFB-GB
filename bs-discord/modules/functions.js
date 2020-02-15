@@ -63,7 +63,7 @@ module.exports = client => {
 
   client.BSDiscord.loadCommand = commandName => {
     try {
-      client.Logger.log(`|BS-Discord| Loading Command: ${commandName}.`);
+      client.logger.log(`|BS-Discord| Loading Command: ${commandName}.`);
       const props = require(`../commands/${commandName}`);
       if (props.init) {
         props.init(client);
@@ -74,7 +74,7 @@ module.exports = client => {
       });
       return false;
     } catch (e) {
-      client.Logger.error(e.stack);
+      client.logger.error(e.stack);
       return `Unable to load command ${commandName}: ${e}`;
     }
   };

@@ -28,7 +28,7 @@ exports.run = async (client, message, args) => {
         radioVoiceCnl = g.channels.get(defaultVoiveCnlId);
       } else {
         // End the command because we don't find the channel to manage
-        client.Logger.warn(`|BS-Discord| Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`);
+        client.logger.warn(`|BS-Discord| Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`);
         return false;
       }
     }
@@ -67,9 +67,9 @@ exports.run = async (client, message, args) => {
       {'CONNECT': true},
       'Started a radio program'
     ).then(() => {
-      client.Logger.log(`|BS-Discord| Opened the voice channel '${radioVoiceCnl.name}'`);
+      client.logger.log(`|BS-Discord| Opened the voice channel '${radioVoiceCnl.name}'`);
     }).catch(e => {
-      client.Logger.error(`|BS-Discord| Failed to open the voice channel: 'e'`);
+      client.logger.error(`|BS-Discord| Failed to open the voice channel: 'e'`);
     });
   };
 
@@ -82,9 +82,9 @@ exports.run = async (client, message, args) => {
       {'CONNECT': false},
       'Ended a radio program'
     ).then(() => {
-      client.Logger.log(`|BS-Discord| Closed the voice channel '${radioVoiceCnl.name}'`);
+      client.logger.log(`|BS-Discord| Closed the voice channel '${radioVoiceCnl.name}'`);
     }).catch(e => {
-      client.Logger.error(`|BS-Discord| Failed to close the voice channel: 'e'`);
+      client.logger.error(`|BS-Discord| Failed to close the voice channel: 'e'`);
     });
   };
 

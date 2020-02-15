@@ -19,7 +19,7 @@ exports.run = async (client, message, args) => {
                                                     : null); // If the sender is NOT in any voice channels, return null and end the command
     /* eslint-enable indent */
     if (radioVoiceCnl === null) {
-      client.Logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
+      client.logger.warn(`|BS-Discord| The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`);
       return false;
     }
 
@@ -130,7 +130,7 @@ https://www.youtube.com/watch?v=<動画ID>
           },
         });
 
-        client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
+        client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from YouTube`);
       },
       'DEFAULT': async () => {
         const alias = arg0;
@@ -154,7 +154,7 @@ https://www.youtube.com/watch?v=<動画ID>
               if (radioTextCnl && soundDatum.descLong !== null && !(args.includes('-silent'))) radioTextCnl.send(soundDatum.descLong);
             },
           });
-          client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
+          client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Started playing from local`);
         }
       },
     };
@@ -175,7 +175,7 @@ https://www.youtube.com/watch?v=<動画ID>
       guild: g,
       fadeTime: 1000,
     });
-    client.Logger.log(`|BS-Discord| Paused`);
+    client.logger.log(`|BS-Discord| Paused`);
   };
 
   subCommands['resume'] = async args => {
@@ -184,7 +184,7 @@ https://www.youtube.com/watch?v=<動画ID>
       guild: g,
       fadeTime: 1000,
     });
-    client.Logger.log(`|BS-Discord| Resumed`);
+    client.logger.log(`|BS-Discord| Resumed`);
   };
 
   subCommands['stop'] = async args => {
@@ -194,19 +194,19 @@ https://www.youtube.com/watch?v=<動画ID>
       fadeTime: 2000,
       reason: 'User',
     });
-    client.Logger.log(`|BS-Discord| Stopped`);
+    client.logger.log(`|BS-Discord| Stopped`);
   };
 
   subCommands['vol'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await setVol(args.shift(), 0);
-    client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
+    client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Set/got volume`);
   };
 
   subCommands['fade'] = async args => {
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await setVol(args.shift(), args.shift());
-    client.Logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
+    client.logger.log(`|BS-Discord| Subcommand: ${subCmdStr} ::: Faded volume`);
   };
   subCmdName = Object.keys(subCommands).includes(subCmdName) ? subCmdName : 'help';
   subCommands[subCmdName](args);

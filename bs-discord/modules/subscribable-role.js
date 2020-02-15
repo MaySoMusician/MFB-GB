@@ -49,7 +49,7 @@ module.exports = async client => {
           if (err) reject(err);
 
           const discordID = (role.roleObj) ? role.roleObj.id : role.role_guild_id;
-          client.Logger.log(`|SubscribableRole| Set '${optionName}' of the role (In-bot ID: ${roleId}, In-Discord ID: ${discordID}) for '${optionValue}'`);
+          client.logger.log(`|SubscribableRole| Set '${optionName}' of the role (In-bot ID: ${roleId}, In-Discord ID: ${discordID}) for '${optionValue}'`);
           resolve();
         }
       );
@@ -65,7 +65,7 @@ module.exports = async client => {
     }
 
     client.BSDiscord.SubscribableRole.loadedRoles.set(roleId, newRole);
-    client.Logger.log(`|SubscribableRole| Updated the loaded role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
+    client.logger.log(`|SubscribableRole| Updated the loaded role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
   };
 
   // In order for a role not to expire, set dateExpireAt for null
@@ -104,7 +104,7 @@ module.exports = async client => {
       mentionable: false,
     }, 'New subcribable role');
 
-    client.Logger.log(`|SubscribableRole| Created a new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the guild '${guild.name}' (${guild.id})`);
+    client.logger.log(`|SubscribableRole| Created a new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the guild '${guild.name}' (${guild.id})`);
 
     const newRoleEntry = {
       id: numId,
@@ -117,7 +117,7 @@ module.exports = async client => {
     };
 
     client.BSDiscord.SubscribableRole.loadedRoles.set(numId, newRoleEntry);
-    client.Logger.log(`|SubscribableRole| Registered the new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) to the client`);
+    client.logger.log(`|SubscribableRole| Registered the new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) to the client`);
 
     return new Promise((resolve, reject) => {
       client.db.subscribableRolesDB.run(
@@ -134,10 +134,10 @@ module.exports = async client => {
         },
         err => {
           if (err) {
-            client.Logger.error(`|SubscribableRole| Couldn't register the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table: ${err}`);
+            client.logger.error(`|SubscribableRole| Couldn't register the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table: ${err}`);
             reject(err);
           }
-          client.Logger.log(`|SubscribableRole| Registered the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table`);
+          client.logger.log(`|SubscribableRole| Registered the role (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the 'roles' table`);
           resolve(numId);
         }
       );
@@ -195,7 +195,7 @@ module.exports = async client => {
           err => {
             if (err) reject(err);
 
-            client.Logger.log(`|SubscribableRole| Canceled the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
+            client.logger.log(`|SubscribableRole| Canceled the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
             resolve();
           }
         );
@@ -221,7 +221,7 @@ module.exports = async client => {
           err => {
             if (err) reject(err);
 
-            client.Logger.log(`|SubscribableRole| Set the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
+            client.logger.log(`|SubscribableRole| Set the expiration task of the role (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id})`);
             resolve();
           }
         );
@@ -238,7 +238,7 @@ module.exports = async client => {
 
     if (role.roleObj === null) {
       await client.BSDiscord.SubscribableRole.setStatus(id, 'deleted');
-      client.Logger.warn(`|SubscribableRole| The role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) seems to have been deleted from the guild (${role.role_guild_id}). Set its status for 'deleted'`);
+      client.logger.warn(`|SubscribableRole| The role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) seems to have been deleted from the guild (${role.role_guild_id}). Set its status for 'deleted'`);
       return;
     }
 
@@ -253,7 +253,7 @@ module.exports = async client => {
     }
 
     client.BSDiscord.SubscribableRole.loadedRoles.set(id, role);
-    client.Logger.log(`|SubscribableRole| Re-registered the role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) to the client`);
+    client.logger.log(`|SubscribableRole| Re-registered the role '${role.role_name}' (In-bot ID: ${id}, In-Discord ID: ${role.role_id}) to the client`);
   };
 
   client.BSDiscord.SubscribableRole.loadOngoingRoles = async () => {
@@ -263,13 +263,13 @@ module.exports = async client => {
         {},
         (err, row) => {
           if (err) {
-            client.Logger.error(`|SubscribableRole| An error occurred during getting ongoing roles from the roles table: ${err}`);
+            client.logger.error(`|SubscribableRole| An error occurred during getting ongoing roles from the roles table: ${err}`);
             return;
           }
           try {
             client.BSDiscord.SubscribableRole.loadRoleById(row.id);
           } catch (e) {
-            client.Logger.error(`|SubscribableRole| An error occurred during loading an ongoing role: ${e}`);
+            client.logger.error(`|SubscribableRole| An error occurred during loading an ongoing role: ${e}`);
           }
         }
       );
@@ -285,7 +285,7 @@ module.exports = async client => {
     }
 
     return member.addRole(role.roleObj.id, 'Subscribe a subscribable role').then(m => {
-      client.Logger.log(`|SubscribableRole| Added the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) to ${m.user.tag}(${m.user.id})`);
+      client.logger.log(`|SubscribableRole| Added the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) to ${m.user.tag}(${m.user.id})`);
     });
   };
 
@@ -298,7 +298,7 @@ module.exports = async client => {
     }
 
     return member.removeRole(role.roleObj.id, 'Unsubscribe a subscribable role').then(m => {
-      client.Logger.log(`|SubscribableRole| Removed the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) from ${m.user.tag}(${m.user.id})`);
+      client.logger.log(`|SubscribableRole| Removed the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) from ${m.user.tag}(${m.user.id})`);
     });
   };
 
@@ -314,7 +314,7 @@ module.exports = async client => {
       await client.BSDiscord.SubscribableRole.setStatus(roleId, 'expired');
       client.BSDiscord.SubscribableRole.loadedRoles.delete(roleId);
 
-      client.Logger.log(`|SubscribableRole| The role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) has expired`);
+      client.logger.log(`|SubscribableRole| The role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) has expired`);
     });
   };
 

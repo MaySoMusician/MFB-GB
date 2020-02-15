@@ -21,7 +21,7 @@ exports.run = async (client, message, args) => {
     client.BSDiscord.user.setStatus('invisible');
   });
 
-  client.Logger.log('You can now kill me safely');
+  client.logger.log('You can now kill me safely');
 };
 
 exports.conf = {

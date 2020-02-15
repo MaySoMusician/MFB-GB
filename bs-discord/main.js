@@ -37,7 +37,7 @@ module.exports = client => {
   const init = async () => {
     // Here we load **commands** into memory, as a collection, so they're accessible here and everywhere else.
     const cmdFiles = await readdir('./bs-discord/commands/'); // somehow readdir method need a parent directory path 'bs-discord'
-    client.Logger.log(
+    client.logger.log(
       `|BS-Discord| Loading a total of ${cmdFiles.length} commands...`
     );
     cmdFiles.forEach(f => {
@@ -48,12 +48,12 @@ module.exports = client => {
 
     // Then we load events, which will include our message and ready event.
     const evtFiles = await readdir('./bs-discord/events/');
-    client.Logger.log(
+    client.logger.log(
       `|BS-Discord| Loading a total of ${evtFiles.length} events...`
     );
     evtFiles.forEach(file => {
       const eventName = file.split('.')[0];
-      client.Logger.log(`|BS-Discord| Loading Event: ${eventName}`);
+      client.logger.log(`|BS-Discord| Loading Event: ${eventName}`);
       const event = require(`./events/${file}`);
       // Bind the client to any event, before the existing arguments provided by Discord.js
       // This line is awesome by the way. Just sayin'.

@@ -3,19 +3,19 @@ const moment = require('moment');
 module.exports = client => {
   const tasks = {
     'testScheduler': params => {
-      client.Logger.log(`We've just begun a task named 'testScheduler'.`);
-      client.Logger.log(`This is a test for client Scheduler.`);
-      client.Logger.log(`Current date: ${moment().format('YYYY-MM-DD HH:mm:ss')}`);
-      client.Logger.log(`Given parameters: ${params}`);
-      client.Logger.log(`We're about to finish the test successfully.`);
+      client.logger.log(`We've just begun a task named 'testScheduler'.`);
+      client.logger.log(`This is a test for client Scheduler.`);
+      client.logger.log(`Current date: ${moment().format('YYYY-MM-DD HH:mm:ss')}`);
+      client.logger.log(`Given parameters: ${params}`);
+      client.logger.log(`We're about to finish the test successfully.`);
       return true;
     },
     'testFail': params => {
-      client.Logger.log(`This is a test that fails intentionally`);
-      client.Logger.warn(`Logging this as a warning`);
-      client.Logger.error(`Logging this as an error`);
-      client.Logger.debug(`Logging this as a debug info`);
-      client.Logger.log(`We're about to finish the test successfully per se, returning false.`);
+      client.logger.log(`This is a test that fails intentionally`);
+      client.logger.warn(`Logging this as a warning`);
+      client.logger.error(`Logging this as an error`);
+      client.logger.debug(`Logging this as a debug info`);
+      client.logger.log(`We're about to finish the test successfully per se, returning false.`);
       return false;
     },
     'playTimeSignal': params => {
@@ -26,11 +26,11 @@ module.exports = client => {
     },
     'expireSubscribableRole': async params => {
       const {roleId} = params;
-      client.Logger.debug(roleId);
+      client.logger.debug(roleId);
       try {
         await client.BSDiscord.SubscribableRole.expire(roleId);
       } catch (e) {
-        client.Logger.error(`An error occurred in expireSubscribableRole: ${e}`);
+        client.logger.error(`An error occurred in expireSubscribableRole: ${e}`);
         return false;
       }
       return true;
