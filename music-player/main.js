@@ -21,7 +21,7 @@ module.exports = client => {
 
   client.MusicPlayer.sounds = require('../assets/soundInfo.js'); // Load all the sound info
 
-  client.BSDiscord.guilds.map(g => client.MusicPlayer.utils.formatData(g.id)); // Init MusicPlayer.data[GuildID] by the guild
+  client.BSDiscord.guilds.cache.map(g => client.MusicPlayer.utils.formatData(g.id)); // Init MusicPlayer.data[GuildID] by the guild
 
   require('./cmds.js')(client);
 };

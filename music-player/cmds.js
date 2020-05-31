@@ -9,7 +9,7 @@ module.exports = client => {
   // Registers a destructor to the voice dispatcher binding to the guild
   const _registerDestructor = (guild, cnc) => {
     const data = client.MusicPlayer.data[guild.id];
-    data.disp.on('end', reason => { // When the music stops
+    data.disp.on('finish', () => { // When the music stops
       client.MusicPlayer.utils.resetData(guild.id); // Reset dispatcher and volume
       if (data.autonext) client.MusicPlayer.cmds.dequeue(guild); // Automatically start the next music in the queue if autonext enabled
     });
@@ -17,7 +17,7 @@ module.exports = client => {
     if (cnc.listenerCount('disconnect') < 1) {
       cnc.on('disconnect', () => {
         let disp = client.MusicPlayer.data[guild.id].disp;
-        if (disp) disp.end('Disconnected the voice connection somehow.');
+        if (disp) disp.destroy('Disconnected the voice connection somehow.');
       });
     }
   };
@@ -46,7 +46,7 @@ module.exports = client => {
       const ytStream = ytdl('https://www.youtube.com/watch?v=' + movieID, {filter: 'audioonly'});
       await client.wait(100); // Just to be safe
 
-      data.disp = cnc.playStream(ytStream, { // Let's play the music!
+      data.disp = cnc.play(ytStream, { // Let's play the music!
         seek: seek,
         volume: vol,
         bitrate: 'auto',
@@ -78,7 +78,7 @@ module.exports = client => {
     }
 
     cnl.join().then(async cnc => {
-      data.disp = cnc.playFile('assets/' + fileName, { // Let's play the music!
+      data.disp = cnc.play('assets/' + fileName, { // Let's play the music!
         seek: seek,
         volume: vol,
         bitrate: 'auto',
@@ -145,10 +145,11 @@ module.exports = client => {
         fadeTime: fadeTime,
         dry: true,
       });
+      await client.wait(500);
     }
     // By the contrast, if fadeTime is 0, stop the music suddenly
 
-    data.disp.end(reason);
+    data.disp.destroy(reason);
   };
 
   // Pasues the music that is currently playing. If fadeTime is 0, the music will stop suddenly; otherwise, it'll stop after turning down its volume gradually
@@ -167,10 +168,10 @@ module.exports = client => {
         fadeTime: fadeTime,
         dry: true,
       });
+      await client.wait(500);
     }
     // By the contrast, if fadeTime is 0, pause the music suddenly
-
-    data.disp.pause();
+    data.disp.pause(true);
   };
 
   // Resumes the music that was playing before. If fadeTime is 0, the music will resume suddenly; otherwise, it'll resume while turning up its volume gradually
@@ -191,11 +192,11 @@ module.exports = client => {
       });
     } else { // With volume fading in
       data.disp.resume();
-      client.MusicPlayer.cmds.changeVol({
+      /* client.MusicPlayer.cmds.changeVol({
         guild: guild,
         destVol: 0,
         dry: true,
-      });
+      });*/
 
       await client.wait(200); // idk if this's necessary
       await client.MusicPlayer.cmds.fadeVol({
@@ -236,15 +237,18 @@ module.exports = client => {
     if (!dry) data.vol = destVol; // When wet calling
 
     let start = data.disp.volume, // Volume as of before fading
-        wait = 50,
+        wait = 100,
         freq = fadeTime / wait, // Frequency of fading
         diff = destVol - start,
         step = diff / freq,
         fVol = start; // Current volume in fading
 
+    console.log(start, freq, diff, step)
+
     return new Promise(async (resolve, reject) => {
       for (let i = 0; i < freq; i++) {
         fVol += step;
+        // console.log(i, fVol)
 
         // if(data.disp) will NOT work because data won't be overwritten to null when 'client.MusicPlayer.data[guild.id].disp = null'
         if (client.MusicPlayer.data[guild.id].disp) data.disp.setVolume(fVol);
@@ -258,6 +262,6 @@ module.exports = client => {
   };
 
   client.MusicPlayer.cmds.forceReset = guild => {
-    client.BSDiscord.voiceConnections.find(c => c.channel.guild.id === guild.id).disconnect();
+    client.BSDiscord.voice.connections.find(c => c.channel.guild.id === guild.id).disconnect();
   };
 };

@@ -8,7 +8,7 @@ const Discord = require('discord.js');
 exports.run = async (client, message, args) => {
   const cmdsAvailable = client.BSDiscord.commandManager.getCommandsAvailableForUser(message.author.id, !message.guild),
         helpEmbed =
-          new Discord.RichEmbed()
+          new Discord.MessageEmbed()
             .setTitle(`MFB-GB BS-Discord`)
             .setDescription(`${message.author.tag} が実行できるコマンドの一覧`)
             .setColor(0x00ff00);

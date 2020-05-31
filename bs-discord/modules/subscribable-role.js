@@ -97,13 +97,16 @@ module.exports = async client => {
       );
     }
 
-    const newRoleObj = await guild.createRole({ // eslint-disable-line one-var
-      name: name,
-      color: 'DEFAULT',
-      hoist: false,
-      permissions: 0,
-      mentionable: false,
-    }, 'New subcribable role');
+    const newRoleObj = await guild.roles.create({
+      data: {
+        name: name,
+        color: 'DEFAULT',
+        hoist: false,
+        permissions: 0,
+        mentionable: false,
+      },
+      reason: 'New subcribable role',
+    });
 
     client.logger.log(`|SubscribableRole| Created a new role '${name}' (In-bot ID: ${strId}, In-Discord ID: ${newRoleObj.id}) in the guild '${guild.name}' (${guild.id})`);
 
@@ -156,9 +159,9 @@ module.exports = async client => {
             reject(err);
           }
 
-          if (res && client.BSDiscord.guilds.has(res.role_guild_id)) {
-            const g = client.BSDiscord.guilds.get(res.role_guild_id);
-            if (g.roles.has(res.role_id)) res.roleObj = g.roles.get(res.role_id);
+          if (res && client.BSDiscord.guilds.cache.has(res.role_guild_id)) {
+            const g = client.BSDiscord.guilds.resolve(res.role_guild_id);
+            if (g.roles.cache.has(res.role_id)) res.roleObj = g.roles.resolve(res.role_id);
             else res.roleObj = null; // probably it's been deleted
           }
           resolve(res);
@@ -285,7 +288,7 @@ module.exports = async client => {
       throw new TypeError(err);
     }
 
-    return member.addRole(role.roleObj.id, 'Subscribe a subscribable role').then(m => {
+    return member.roles.add(role.roleObj.id, 'Subscribe a subscribable role').then(m => {
       client.logger.log(`|SubscribableRole| Added the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) to ${m.user.tag}(${m.user.id})`);
     });
   };
@@ -298,7 +301,7 @@ module.exports = async client => {
       throw new TypeError(err);
     }
 
-    return member.removeRole(role.roleObj.id, 'Unsubscribe a subscribable role').then(m => {
+    return member.roles.remove(role.roleObj.id, 'Unsubscribe a subscribable role').then(m => {
       client.logger.log(`|SubscribableRole| Removed the role '${role.roleObj.name}' (In-bot ID: ${roleId}, In-Discord ID: ${role.roleObj.id}) from ${m.user.tag}(${m.user.id})`);
     });
   };

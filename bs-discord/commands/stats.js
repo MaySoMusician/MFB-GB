@@ -8,9 +8,9 @@ exports.run = async (client, message, args) => {
   message.channel.send(`= MFB-GB BS-Discord 統計 =
 • メモリ使用量 :: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
 • 稼働時間　　 :: ${duration}
-• ユーザー数　 :: ${client.BSDiscord.users.size.toLocaleString()}
-• サーバー数　 :: ${client.BSDiscord.guilds.size.toLocaleString()}
-• チャンネル数 :: ${client.BSDiscord.channels.size.toLocaleString()}
+• ユーザー数　 :: ${client.BSDiscord.users.cache.size.toLocaleString()}
+• サーバー数　 :: ${client.BSDiscord.guilds.cache.size.toLocaleString()}
+• チャンネル数 :: ${client.BSDiscord.channels.cache.size.toLocaleString()}
 • Discord.js  :: v${version}
 • Node        :: ${process.version}`, {code: 'asciidoc'});
   /* eslint-enable no-irregular-whitespace */

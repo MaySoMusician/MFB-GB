@@ -16,8 +16,8 @@ exports.run = async (client, message, args) => {
 
   const getCnls = () => { // eslint-disable-line one-var
     /* eslint-disable indent, operator-linebreak */
-    radioVoiceCnl = g.channels.find(c => c.type === 'voice' && c.name === args[args.length - 1]) // Get the voice channel if its name is provided at the last argument
-                    || (message.member.voiceChannel ? message.member.voiceChannel // Otherwise, get the channel the sender is currently in
+    radioVoiceCnl = g.channels.cache.find(c => c.type === 'voice' && c.name === args[args.length - 1]) // Get the voice channel if its name is provided at the last argument
+                    || (message.member.voice.channel ? message.member.voice.channel // Otherwise, get the channel the sender is currently in
                                                     : null); // If the sender is NOT in any voice channels, return null and end the command
     /* eslint-enable indent, operator-linebreak */
     if (radioVoiceCnl === null) {
@@ -26,7 +26,7 @@ exports.run = async (client, message, args) => {
     }
 
     radioTextCnlID = client.getTextCnlIdByVoiceCnl(g, radioVoiceCnl);
-    if (radioTextCnlID) radioTextCnl = g.channels.get(radioTextCnlID);
+    if (radioTextCnlID) radioTextCnl = g.channels.resolve(radioTextCnlID);
 
     return true;
   };
@@ -175,7 +175,7 @@ https://www.youtube.com/watch?v=<動画ID>
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await client.MusicPlayer.cmds.pause({
       guild: g,
-      fadeTime: 1000,
+      fadeTime: 1600,
     });
     client.logger.log(`Paused`, logCategory);
   };
@@ -193,7 +193,7 @@ https://www.youtube.com/watch?v=<動画ID>
     if (!getCnls()) return false; // Quit if we couldn't get the voice channel
     await client.MusicPlayer.cmds.stop({
       guild: g,
-      fadeTime: 2000,
+      fadeTime: 3000,
       reason: 'User',
     });
     client.logger.log(`Stopped`, logCategory);

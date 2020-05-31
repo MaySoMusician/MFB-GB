@@ -18,8 +18,8 @@ exports.run = async (client, message, args) => {
   const getCnls = () => { // eslint-disable-line one-var
     /* eslint-disable indent */
     // Get the voice channel if its name is provided at the last argument
-    radioVoiceCnl = g.channels.find(c => c.type === 'voice' && c.name === args[args.length - 1])
-                    || (message.member.voiceChannel ? message.member.voiceChannel // Otherwise, get the channel the sender is currently in
+    radioVoiceCnl = g.channels.cache.find(c => c.type === 'voice' && c.name === args[args.length - 1])
+                    || (message.member.voice.channel ? message.member.voice.channel // Otherwise, get the channel the sender is currently in
                                                     : null);
     /* eslint-enable indent */
 
@@ -27,7 +27,7 @@ exports.run = async (client, message, args) => {
       // Get the default voice channel per guild, even if the sender is NOT in any voice channels
       const defaultVoiveCnlId = client.getDefaultStreamingVoiceCnl(g);
       if (defaultVoiveCnlId) {
-        radioVoiceCnl = g.channels.get(defaultVoiveCnlId);
+        radioVoiceCnl = g.channels.resolve(defaultVoiveCnlId);
       } else {
         // End the command because we don't find the channel to manage
         client.logger.warn(`Can't find the channel to manage: No channel name provided, no channel the sender currently in, no default channel`, logCategory);
@@ -64,7 +64,7 @@ exports.run = async (client, message, args) => {
     if (!getCnls()) return;
 
     const roleEveryone = g.defaultRole;
-    radioVoiceCnl.overwritePermissions(
+    radioVoiceCnl.updateOverwrite(
       roleEveryone,
       {'CONNECT': true},
       'Started a radio program'
@@ -79,7 +79,7 @@ exports.run = async (client, message, args) => {
     if (!getCnls()) return;
 
     const roleEveryone = g.defaultRole;
-    radioVoiceCnl.overwritePermissions(
+    radioVoiceCnl.updateOverwrite(
       roleEveryone,
       {'CONNECT': false},
       'Ended a radio program'

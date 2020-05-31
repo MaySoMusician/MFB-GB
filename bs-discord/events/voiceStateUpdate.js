@@ -1,18 +1,21 @@
 const logCategory = 'General';
 
-module.exports = (client, oldMember, newMember) => {
+module.exports = (client, oldState, newState) => {
   if (!client.BSDiscord.ready) return; // Too early!
 
+  const oldMember = oldState.member,
+        newMember = newState.member;
+
   if (oldMember.id === client.BSDiscord.user.id) { // When this is me, change my presence
-    if (oldMember.voiceChannelID !== newMember.voiceChannelID) { // When entering to a voice channel or moving to another channel
-      if (!newMember.voiceChannelID) {
-        if (oldMember.voiceChannel.guild.id !== client.config.guildTargeted) return;
+    if (oldState.channelID !== newState.channelID) { // When entering to a voice channel or moving to another channel
+      if (!newState.channelID) {
+        if (oldState.guild.id !== client.config.guildTargeted) return;
 
         client.BSDiscord.user.setActivity(null);
       } else {
-        if (newMember.voiceChannel.guild.id !== client.config.guildTargeted) return;
+        if (newState.guild.id !== client.config.guildTargeted) return;
 
-        const str = newMember.voiceChannel.name;
+        const str = newState.channel.name;
         client.BSDiscord.user.setActivity(str, {type: 'LISTENING'});
       }
     }
@@ -22,11 +25,11 @@ module.exports = (client, oldMember, newMember) => {
   if (oldMember.user.bot) { // empty
   } else {
     const welcome2VC = m => {
-      const radioVoiceCnl = m.voiceChannel,
-            radioTextCnlID = client.getTextCnlIdByVoiceCnl(oldMember.guild, radioVoiceCnl);
+      const radioVoiceCnl = m.voice.channel,
+            radioTextCnlID = client.getTextCnlIdByVoiceCnl(oldState.guild, radioVoiceCnl);
 
       let radioTextCnl = null;
-      if (radioTextCnlID) radioTextCnl = oldMember.guild.channels.get(radioTextCnlID);
+      if (radioTextCnlID) radioTextCnl = oldState.guild.channels.resolve(radioTextCnlID);
       else return;
 
       const numListener = radioVoiceCnl.members.size;
@@ -50,7 +53,7 @@ module.exports = (client, oldMember, newMember) => {
 
       radioTextCnl.send(joinMsg)
         .then(async msg => {
-          msg.delete(wait4Del).catch(e => {
+          msg.delete({timeout: wait4Del}).catch(e => {
             if (e.code === 10008) client.logger.error(`|BS-Discord| The message has been deleted: ${e.path}`, logCategory);
             else client.logger.error(`|BS-Discord| Unknown error: ${e}\r\n${e.stack}`, logCategory);
           });
@@ -58,9 +61,9 @@ module.exports = (client, oldMember, newMember) => {
     };
 
     if (
-      (!oldMember.voiceChannel && newMember.voiceChannel)
-      || (oldMember.voiceChannel && newMember.voiceChannel
-          && oldMember.voiceChannel.id !== newMember.voiceChannel.id)
+      (!oldState.channel && newState.channel)
+      || (oldState.channel && newState.channel
+          && oldState.channel.id !== newState.channel.id)
     ) {
       welcome2VC(newMember);
       return;
