@@ -3,7 +3,7 @@ const {version} = require('discord.js'),
 require('moment-duration-format');
 
 exports.run = async (client, message, args) => {
-  const duration = moment.duration(client.uptime).format(' D [日] H [時間] m [分] s [秒]');
+  const duration = moment.duration(client.BSDiscord.uptime).format(' D [日] H [時間] m [分] s [秒]');
   /* eslint-disable no-irregular-whitespace */
   message.channel.send(`= MFB-GB BS-Discord 統計 =
 • メモリ使用量 :: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
