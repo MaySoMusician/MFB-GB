@@ -15,11 +15,11 @@ exports.run = async (client, message, args) => {
   if (subCmdName) subCmdName = subCmdName.toLowerCase();
 
   const getCnls = () => { // eslint-disable-line one-var
-    /* eslint-disable indent */
+    /* eslint-disable indent, operator-linebreak */
     radioVoiceCnl = g.channels.find(c => c.type === 'voice' && c.name === args[args.length - 1]) // Get the voice channel if its name is provided at the last argument
                     || (message.member.voiceChannel ? message.member.voiceChannel // Otherwise, get the channel the sender is currently in
                                                     : null); // If the sender is NOT in any voice channels, return null and end the command
-    /* eslint-enable indent */
+    /* eslint-enable indent, operator-linebreak */
     if (radioVoiceCnl === null) {
       client.logger.warn(`The message sender doesn't provide any voice channel name, nor isn't in any channel, though it's needed`, logCategory);
       return false;
